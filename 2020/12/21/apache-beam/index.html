@@ -1,0 +1,182 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<link rel="bookmark"  type="image/x-icon"  href="/img/knight.jpg"/>
+	<link rel="shortcut icon" href="/img/knight.jpg">
+	
+			    <title>
+    SouthRa
+    </title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="/css/mic_main.css" />
+    <link rel="stylesheet" href="/css/dropdownMenu.css" />
+    <meta name="keywords" content="southra" />
+    
+    <noscript>
+        <link rel="stylesheet" href="/css/noscript.css" />
+    </noscript>
+    <style type="text/css">
+        body:before {
+          content: ' ';
+          position: fixed;
+          top: 0;
+          background: url('/img/bg.png') center 0 no-repeat;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          background-size: cover; 
+        }
+    </style>
+
+			    
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script async type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.scrollex.min.js"></script>
+    <script src="/js/jquery.scrolly.min.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/util.js"></script>
+    <script src="/js/main.js"></script>
+	
+<meta name="generator" content="Hexo 5.3.0"></head>
+    
+		
+<!-- Layouts -->
+
+
+
+<!--  代码渲染  -->
+<link rel="stylesheet" href="/css/prism_coy.css" />
+<link rel="stylesheet" href="/css/typo.css" />
+<!-- 文章页 -->
+<body class="is-loading">
+    <!-- Wrapper 外包 s-->
+    <div id="wrapper" class="fade-in">
+        <!-- Intro 头部显示 s -->
+        <!-- Intro 头部显示 e -->
+        <!-- Header 头部logo start -->
+        <header id="header">
+    <a href="/" class="logo">SouthRa</a>
+</header>
+        <!-- Nav 导航条 start -->
+        <nav id="nav" class="special" >
+            <ul class="menu links" >
+			<!-- Homepage  主页  --> 
+			<li >
+	            <a href="/" rel="nofollow">SouthRa</a>
+	        </li>
+			<!-- categories_name  分类   --> 
+	        
+	        <li class="active">
+	            <a href="#s1">Categories</a>
+	                    <ul class="submenu">
+	                        <li>
+	                        <a class="category-link" href="/categories/%E6%8A%80%E8%A1%93%E7%AD%86%E8%A8%98/">技術筆記</a></li><li><a class="category-link" href="/categories/%E8%A7%A3%E9%A1%8C%E5%88%86%E4%BA%AB/">解題分享</a>
+	                    </ul>
+	        </li>
+	        
+	        <!-- archives  归档   --> 
+	        
+	        
+		        <!-- Pages 自定义   -->
+		        
+		        <li>
+		            <a href="/group/" title="其他文章">
+		                其他文章
+		            </a>
+		        </li>
+		        
+		        <li>
+		            <a href="/tag/" title="Tags">
+		                Tags
+		            </a>
+		        </li>
+		        
+
+
+            </ul>
+            <!-- icons 图标   -->
+			<ul class="icons">
+                    
+                    <li>
+                        <a title="github" href="https://github.com/ko19951231" target="_blank" rel="noopener">
+                            <i class="icon fa fa-github"></i>
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a title="linkedin" href="https://www.linkedin.com/in/chu-ling-ko/" target="_blank" rel="noopener">
+                            <i class="icon fa fa-linkedin"></i>
+                        </a>
+                    </li>
+                    
+			</ul>
+</nav>
+
+        <div id="main" >
+            <div class ="post_page_title_img" style="height: 25rem;background-image: url(/images/beamdataflow.png);background-position: center; background-repeat:no-repeat; background-size:cover;-moz-background-size:cover;overflow:hidden;" >
+                <a href="#" style="padding: 4rem 4rem 2rem 4rem ;"><h2 >Apache Beam &amp; Dataflow 撞牆筆記</h2></a>
+            </div>
+            <!-- Post -->
+            <div class="typo" style="padding: 3rem;">
+                <h1 id="Apache-Beam-amp-Google-Cloud-Dataflow-撞牆筆記"><a href="#Apache-Beam-amp-Google-Cloud-Dataflow-撞牆筆記" class="headerlink" title="Apache Beam &amp; Google Cloud Dataflow 撞牆筆記"></a>Apache Beam &amp; Google Cloud Dataflow 撞牆筆記</h1><h2 id="介紹"><a href="#介紹" class="headerlink" title="介紹"></a>介紹</h2><p>Apache beam 是一套開發工具，可以用來設計並描述平行化資料處理的 pipeline。描述好的 pipeline 則會用到分散式處理的後端來執行，例如 Google Cloud Dataflow，它可以依據設定分派 Google Cloud 上的運算資源來完成運算，還會依據流量來自動調節資源使用的多寡。若你的程式包含了資料量龐大且互不相依的資料處理，使用 Apache Beam + Dataflow 來達成分散式處理進而縮短程式執行時間，會是個很好的選擇。</p>
+<p>Apache Beam 與 Google Cloud Dataflow 都有詳盡且親切的官方文件可以參考，甚至還有手把手教你的 Example walk-through，因此這篇不再贅述如何使用這兩項工具。這篇將會著重在我自己使用這套工具時所遇到的問題，以及我的解決方式。其實這兩項工具並非主流，網路上的討論度也不算高，所以滿多解法都是我自己硬幹出來的，我沒辦法保證這是最好的做法，如果有更好的做法歡迎指正，我也會趕緊更新的。</p>
+<h2 id="入門學習資源"><a href="#入門學習資源" class="headerlink" title="入門學習資源"></a>入門學習資源</h2><p>這份文件介紹如何使用 Python 或 Java 編寫 pipeline：<a target="_blank" rel="noopener" href="https://beam.apache.org/documentation/programming-guide"><strong><font color='blue'>Apache Beam Programing Guide</font></strong></a></p>
+<p>這篇則示範如何建立一個 pipeline 用來計算某文件內每個字的出現頻率：<a target="_blank" rel="noopener" href="https://beam.apache.org/get-started/wordcount-example"><strong><font color='blue'>Wordcount Example</font></strong></a><br>(統計文件字數可以把文件分成數個 batch 互不相依地平行統計，最後再加總就行，所以適合用 pipeline 處理)</p>
+<p>使用 Apache Beam 建立好的 pipeline 已經可以在你的 local 電腦正確地執行了，但沒有運用到分散式運算資源的話當然不可能縮短執行的時間。使用 Google Cloud Dataflow 則可以讓它支配 Google Cloud 上的運算資源執行你的 pipeline</p>
+<p>這份文件介紹如何用 Dataflow，包括部署、執行、監控 pipeline 等等：<a target="_blank" rel="noopener" href="https://cloud.google.com/dataflow/docs/how-to"><strong><font color='blue'>Dataflow How-to Guideline</font></strong></a></p>
+<p>這篇則示範用 Apache Beam, Dataflow 配上 Tensorflow 做機器學習：<a target="_blank" rel="noopener" href="https://cloud.google.com/dataflow/docs/samples/molecules-walkthrough"><strong><font color='blue'>Molecules Walkthrough</font></strong></a><br>(最主要是在第二步驟的 preprocess 部分，它示範了更複雜的 pipeline 架構以及涵蓋了讀檔寫檔)</p>
+<p>如果要使用 GCP 上的運算資源的話，記得要先購置好足夠的 CPU、memory 等 quota 在你的 GCP project 上，並且開啟權限讓 Dataflow 支配。</p>
+<h2 id="撞牆經驗分享"><a href="#撞牆經驗分享" class="headerlink" title="撞牆經驗分享"></a>撞牆經驗分享</h2><p>其實用 Apache Beam 編寫好的 pipeline 很容易就能正確地在 local 執行，會出問題的都在於連接遠端的分散式的機器上面。因為使用 Dataflow 等於是要奴役那些在 GCP 上面的 worker virtual machine，而那些 worker VM 都是為了跑 pipeline 而臨時組出的空機器，因此不管你在本地安裝了什麼套件、準備了什麼檔案讓程式讀，worker VM 們都碰不到。</p>
+<h3 id="Dependency"><a href="#Dependency" class="headerlink" title="Dependency"></a>Dependency</h3><p>舉例來說，我們的程式可能會用到 numpy 以及 tensorflow，因此在本地我們會先 pip install 這些套件，然而雲端上的 worker VM 裡面沒有這些套件，因此在執行我們所寫的 <code>import numpy</code> 時就會出問題。要讓雲端上的 worker VM 能夠順利 import 這些套件，我們需要準備一份 setup.py，並且把程式裡面所有會用到的 python 套件都羅列進去。這樣一來，只要在執行程式時加入參數就行，例如</p>
+<p><code>python main.py --setup_file ./setup.py</code></p>
+<p>關於 setup.py 裡面該寫些什麼，可以參考 <a target="_blank" rel="noopener" href="https://github.com/GoogleCloudPlatform/cloudml-samples/blob/master/molecules/setup.py"><strong><font color='blue'>Molecules Walkthrough 的 setup.py</font></strong></a> ，以及詳細的 <a target="_blank" rel="noopener" href="https://beam.apache.org/documentation/sdks/python-pipeline-dependencies/"><strong><font color='blue'>Apache Beam 文件 - dependencies</font></strong></a>。建議在羅列套件時可以在每個套件後面加上和自己本地相同的版本號，雖然如果不加版本號的話，VM 會預設是最新的版本，但如果 VM 上裝的版本和你本地的版本不同，就可能產生不相容的問題，例如你依據 a 版本的 API 寫出的 code 從 b 版本的角度是錯誤的 code 等等。</p>
+<p>至於有些套件必須要用 apt-get install 安裝，那就比較棘手了。Apache Beam 的文件裡面有寫道，這些額外的安裝指令必須寫在 setup.py 的 Custom command 裡，這份 <a target="_blank" rel="noopener" href="https://github.com/apache/beam/blob/master/sdks/python/apache_beam/examples/complete/juliaset/setup.py"><strong><font color='blue'>Juliaset 的 setup.py</font></strong></a> 裡面就有詳細的範例和解說。有些 python 套件確實要先安裝 non-python 的套件才能安裝，例如 openslide 就是個例子。</p>
+<p>鬼畜的是 Dataflow 若在這一步出問題，它不會顯示任何可辨認的錯誤訊息，而是會讓程式一直零 throughput 地空轉，我當時花了好幾天抽絲剝繭才發現是我沒安裝某個 non-python 套件的問題，真是太崩潰了。</p>
+<h3 id="檔案讀寫"><a href="#檔案讀寫" class="headerlink" title="檔案讀寫"></a>檔案讀寫</h3><h3 id="禁用-Public-IP"><a href="#禁用-Public-IP" class="headerlink" title="禁用 Public IP"></a>禁用 Public IP</h3><h3 id="一些演算邏輯上的小-Trick"><a href="#一些演算邏輯上的小-Trick" class="headerlink" title="一些演算邏輯上的小 Trick"></a>一些演算邏輯上的小 Trick</h3>
+            </div>
+
+            <!-- Post Comments -->
+            
+
+        </div>
+        <!-- Copyright 版权 start -->
+                <div id="copyright">
+            <ul>
+                <li>&copy;Powered By <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/" style="border-bottom: none;">hexo</a></li>
+                <li>Design: <a target="_blank" rel="noopener" href="http://miccall.tech " style="border-bottom: none;">miccall</a></li>
+            </ul>
+            
+				<span id="busuanzi_container_site_pv"> 2020 </span> 
+			
+        </div>
+    </div>
+</body>
+
+
+
+ 	
+</html>

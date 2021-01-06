@@ -1,0 +1,190 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<link rel="bookmark"  type="image/x-icon"  href="/img/knight.jpg"/>
+	<link rel="shortcut icon" href="/img/knight.jpg">
+	
+			    <title>
+    SouthRa
+    </title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="/css/mic_main.css" />
+    <link rel="stylesheet" href="/css/dropdownMenu.css" />
+    <meta name="keywords" content="southra" />
+    
+    <noscript>
+        <link rel="stylesheet" href="/css/noscript.css" />
+    </noscript>
+    <style type="text/css">
+        body:before {
+          content: ' ';
+          position: fixed;
+          top: 0;
+          background: url('/img/bg.png') center 0 no-repeat;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          background-size: cover; 
+        }
+    </style>
+
+			    
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script async type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.scrollex.min.js"></script>
+    <script src="/js/jquery.scrolly.min.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/util.js"></script>
+    <script src="/js/main.js"></script>
+	
+<meta name="generator" content="Hexo 5.3.0"></head>
+    
+		
+<!-- Layouts -->
+
+
+
+<!--  代码渲染  -->
+<link rel="stylesheet" href="/css/prism_coy.css" />
+<link rel="stylesheet" href="/css/typo.css" />
+<!-- 文章页 -->
+<body class="is-loading">
+    <!-- Wrapper 外包 s-->
+    <div id="wrapper" class="fade-in">
+        <!-- Intro 头部显示 s -->
+        <!-- Intro 头部显示 e -->
+        <!-- Header 头部logo start -->
+        <header id="header">
+    <a href="/" class="logo">SouthRa</a>
+</header>
+        <!-- Nav 导航条 start -->
+        <nav id="nav" class="special" >
+            <ul class="menu links" >
+			<!-- Homepage  主页  --> 
+			<li >
+	            <a href="/" rel="nofollow">SouthRa</a>
+	        </li>
+			<!-- categories_name  分类   --> 
+	        
+	        <li class="active">
+	            <a href="#s1">Categories</a>
+	                    <ul class="submenu">
+	                        <li>
+	                        <a class="category-link" href="/categories/%E6%8A%80%E8%A1%93%E7%AD%86%E8%A8%98/">技術筆記</a></li><li><a class="category-link" href="/categories/%E8%A7%A3%E9%A1%8C%E5%88%86%E4%BA%AB/">解題分享</a>
+	                    </ul>
+	        </li>
+	        
+	        <!-- archives  归档   --> 
+	        
+	        
+		        <!-- Pages 自定义   -->
+		        
+		        <li>
+		            <a href="/group/" title="其他文章">
+		                其他文章
+		            </a>
+		        </li>
+		        
+		        <li>
+		            <a href="/tag/" title="Tags">
+		                Tags
+		            </a>
+		        </li>
+		        
+
+
+            </ul>
+            <!-- icons 图标   -->
+			<ul class="icons">
+                    
+                    <li>
+                        <a title="github" href="https://github.com/ko19951231" target="_blank" rel="noopener">
+                            <i class="icon fa fa-github"></i>
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a title="linkedin" href="https://www.linkedin.com/in/chu-ling-ko/" target="_blank" rel="noopener">
+                            <i class="icon fa fa-linkedin"></i>
+                        </a>
+                    </li>
+                    
+			</ul>
+</nav>
+
+        <div id="main" >
+            <div class ="post_page_title_img" style="height: 25rem;background-image: url(https://upload.wikimedia.org/wikipedia/commons/6/64/2048_Screenshot.png);background-position: center; background-repeat:no-repeat; background-size:cover;-moz-background-size:cover;overflow:hidden;" >
+                <a href="#" style="padding: 4rem 4rem 2rem 4rem ;"><h2 >從 2048 學習 RL</h2></a>
+            </div>
+            <!-- Post -->
+            <div class="typo" style="padding: 3rem;">
+                <h1 id="2048-與-reinforcement-learning-學習筆記"><a href="#2048-與-reinforcement-learning-學習筆記" class="headerlink" title="2048 與 reinforcement learning 學習筆記"></a>2048 與 reinforcement learning 學習筆記</h1><p>在我大四的時候，我修了一門名為「<a target="_blank" rel="noopener" href="https://timetable.nctu.edu.tw/?r=main/crsoutline&Acy=108&Sem=1&CrsNo=5220&lang=zh-tw"><strong><font color='blue'>電腦對局理論</font></strong></a>」的課，老師教了許多棋盤類相關遊戲的輸贏理論、各種狀態搜尋演算法，以及用 2048 遊戲的 AI 實作貫穿了整堂課，包含了 TD learning、n-tuple network、狀態搜尋等等，我覺得用 2048 這個遊戲來貫穿遊戲 AI 的永字八法真的太神了！</p>
+<p>這篇用來記錄我吸收整理後的學習筆記，我非常非常推薦入門者也用 2048 這套教材學習。這門課真的讓人收穫滿滿，讚嘆吳毅成教授以及助教學長們~~</p>
+<h2 id="2048-遊戲規則"><a href="#2048-遊戲規則" class="headerlink" title="2048 遊戲規則"></a>2048 遊戲規則</h2><p>如果你還不熟悉 2048 的規則，可以直接在 <a target="_blank" rel="noopener" href="https://play2048.co/"><strong><font color='blue'>2048 的網頁</font></strong></a> 玩玩看。盤面上所有的磚塊上數值都是 $2$ 的冪次方 $(2^k)$，每次玩家都可以往「上、下、左、右」其中一個方向滑動盤面，滑動後所有磚塊都會往該方向併攏，如果有兩塊磚塊數值一樣 $(2^k)$ 被併攏在一起的話就會融合成一個新磚塊 $(2^{k+1})$，並且讓玩家賺到 $2^{k+1}$ 的分數。玩家完成滑動後，系統會在沒有磚塊的地方隨機生成一個數值為 $2$ 或 $4$ 的新磚塊，再讓玩家繼續下一輪的滑動，雙方反覆直到玩家再也沒辦法滑動盤面為止。</p>
+<p>遊戲結束時，所有合併磚塊時得到的分數加總起來就是玩家的分數了。在玩遊戲的過程中，會因為合併而不斷產生更大數值的方塊，例如 $1024、2048$ 甚至更大的數字，而隨著盤面上數值不同無法合併的磚塊愈來愈多，盤面就愈來愈容易被塞滿而結束，因此要如何一邊賺分數、一邊盡量不把盤面玩死，就是一大挑戰。本篇要介紹的就是如何設計一支「很會玩 2048 的AI」。</p>
+<p>順道一題，課程中所使用的遊戲是 2048 的變種 - 2584，是用費波納契數列當成盤面數值，例如 $2$ 和 $3$ 合併成 $5$ 這樣，這會讓遊戲變得更困難一些。不過設計 AI 時的概念還是和 2048 很相同的，因此本篇會繼續以 2048 為例。</p>
+<h2 id="Agent-的動作"><a href="#Agent-的動作" class="headerlink" title="Agent 的動作"></a>Agent 的動作</h2><p>2048 玩法超級單純，玩家只有四種動作可以做：「往上滑」、「往下滑」、「往左滑」、「往右滑」。因此我們設計的 AI agent 也是每次都將在四個方向中擇一動作。</p>
+<h3 id="貪心地玩-2048"><a href="#貪心地玩-2048" class="headerlink" title="貪心地玩 2048"></a>貪心地玩 2048</h3><p>在開始介紹 learning 相關的技法之前，先來介紹一個單純以貪心為圭臬的策略，雖然「貪心」聽起來不明智，但其實光這樣已經可以玩得很高分了。這個策略就是：對於每個能滑的方向，計算光是這個滑動能賺多少分數，然後永遠選擇能賺最多分數的滑動方向。</p>
+<p><img src="https://i.imgur.com/XZPV0Lm.png"></p>
+<p>以上圖為例，向左或向右滑動可以合併 $2+2$ 和 $8+8$，因此可以賺 $20$ 分；而向上或向下滑動可以合併 $2+2$，因此可以賺 $4$ 分。我們要貪心地選擇能賺最多分的方向，所以會選擇向左(或向右)滑。</p>
+<p>由於我們玩遊戲的目標本就是盡量「賺很多的分數」，所以貪心地選擇當下能賺分最多的方向是很有幫助的！唯一的問題在於，滑完後盤面長怎樣，其實對於遊戲的「前途」是很重要的，亂糟糟大小相間的盤面大概過沒多久就會玩死了，但這個貪心策略絲毫不考慮滑完以後盤面會變得怎麼樣。</p>
+<p>想像一個情境：<br>往左滑，雖然可以賺較多分，卻把盤面弄成爛攤子，馬上就要死了<br>往上滑，雖然當下沒賺分，卻能變成很有前途的盤面，一堆分數等著我們繼續賺<br>這樣當然是要選擇往上囉!</p>
+<p>因此，在每次選擇該往哪邊滑的時候，我們不只要考慮當下能賺幾分，還要考慮滑完之後的盤面有沒有「前途」。</p>
+<h3 id="考慮前途地玩-2048"><a href="#考慮前途地玩-2048" class="headerlink" title="考慮前途地玩 2048"></a>考慮前途地玩 2048</h3><p>假設我們有一個神奇函數，只要把滑動後的盤面丟進去，它就能預估「出現這個盤面過後，還能夠再賺多少分數才會遊戲結束」，也就是所謂的「這個盤面多有前途」。有了這個函數的話，我們就能讓 agent 更聰明地選擇方向了，那就是永遠選擇「該次滑動賺的分數」加上「滑完的盤面預計還能賺的分數」最高的滑動方向。</p>
+<p><img src="https://i.imgur.com/NteLdRn.png"></p>
+<p>以上圖為例，往右滑能賺 $8$ 分，並且估計能再賺 $100$ 分才結束遊戲，因此往右滑能賺到的分數總共是 $108$；而往下滑能賺 $0$ 分，並且估計能再賺 $300$ 分才結束遊戲，因此往下滑能賺到的分數總共是 $300$，所以我們設計的 agent 該選擇往下滑。</p>
+<p>估算「前途」的函數愈準確，這個策略就會愈強大。至於這個神奇函數怎麼來，我們可以透過經驗來調整，而經驗怎麼累積，則是來自於一場又一場的遊戲。這就是所謂的強化學習！接下來我們將探討如何利用強化學習，訓練出能夠估算「某個盤面到死前還能賺多少分數」的函數。</p>
+<h2 id="估計「前途」的函數"><a href="#估計「前途」的函數" class="headerlink" title="估計「前途」的函數"></a>估計「前途」的函數</h2><p>想要準準地估算某個盤面還能再賺多少分才死，最好的方法就是看看這些盤面在實際的遊戲中究竟賺了幾分。</p>
+<p><img src="https://i.imgur.com/zapknF4.png"></p>
+<p>以上圖為例，假設上圖是某一局遊戲從開局到結束的過程，並且遊戲結束後總共賺了 987 分。有了這個數據，我們就能知道這局遊戲過程出現的每個盤面分別有多少「前途」了！</p>
+<p><img src="https://i.imgur.com/oQuEHYh.png"></p>
+<p>舉例來說，在這場遊戲中，出現左下角兩塊 $2$ 之後又賺了 987 分才結束，我們把這個數據存下來，然後下次我們再遇到左下角有兩塊 $2$ 的盤面時，我們就可以估計這個盤面還能再賺 987 分！只要我們一直不斷地玩遊戲，蒐集所有出現過的盤面以及最後結果，我們就有愈來愈多的數據用來幫助我們預估每個盤面的潛力值。要注意的是我們只在乎「滑動後」的盤面的潛力值，因為只有滑往什麼方向是我們可以決定的，系統要在哪裡跳出新磚塊不是我們能決定的。</p>
+<h3 id="Temporal-difference-learning"><a href="#Temporal-difference-learning" class="headerlink" title="Temporal difference learning"></a>Temporal difference learning</h3><p>Temporal difference learning, 簡稱 TD learning，是reinforcement learning (強化學習) 的種類之一。關於 TD learning 的詳細說明，可以參考 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Temporal_difference_learning"><strong><font color='blue'>TD learning 的維基百科</font></strong></a>，簡而言之他的特色在於，每個狀態都把它在某場遊戲中的「下一個狀態」以及「兩者之間的分數差值」當成目標學習，而非把那場遊戲的最終狀態和分數當成目標。舉例來說，在某場遊戲中，agent 在第 $t$ 步賺了 $x$ 分並滑出 $A$ 盤面，在第 $t+1$ 步賺了 $y$ 分並滑出 $B$ 盤面，那麼對 $A$ 盤面來說，它的學習目標即為 $B$ 盤面的估計值加上 $y$，而非此場遊戲在出現 $A$ 盤面後的真正的賺分總合。</p>
+<h2 id="N-tuple-network"><a href="#N-tuple-network" class="headerlink" title="N-tuple network"></a>N-tuple network</h2><h2 id="遊戲狀態搜尋"><a href="#遊戲狀態搜尋" class="headerlink" title="遊戲狀態搜尋"></a>遊戲狀態搜尋</h2>
+            </div>
+
+            <!-- Post Comments -->
+            
+
+        </div>
+        <!-- Copyright 版权 start -->
+                <div id="copyright">
+            <ul>
+                <li>&copy;Powered By <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/" style="border-bottom: none;">hexo</a></li>
+                <li>Design: <a target="_blank" rel="noopener" href="http://miccall.tech " style="border-bottom: none;">miccall</a></li>
+            </ul>
+            
+				<span id="busuanzi_container_site_pv"> 2021 </span> 
+			
+        </div>
+    </div>
+</body>
+
+
+
+ 	
+</html>

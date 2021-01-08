@@ -138,11 +138,11 @@
 
         <div id="main" >
             <div class ="post_page_title_img" style="height: 25rem;background-image: url(https://upload.wikimedia.org/wikipedia/commons/6/64/2048_Screenshot.png);background-position: center; background-repeat:no-repeat; background-size:cover;-moz-background-size:cover;overflow:hidden;" >
-                <a href="#" style="padding: 4rem 4rem 2rem 4rem ;"><h2 >從 2048 學習 RL</h2></a>
+                <a href="#" style="padding: 4rem 4rem 2rem 4rem ;"><h2 >從 2048 學習遊戲對局 AI 設計</h2></a>
             </div>
             <!-- Post -->
             <div class="typo" style="padding: 3rem;">
-                <h1 id="2048-與-reinforcement-learning-學習筆記"><a href="#2048-與-reinforcement-learning-學習筆記" class="headerlink" title="2048 與 reinforcement learning 學習筆記"></a>2048 與 reinforcement learning 學習筆記</h1><p>在我大四的時候，我修了一門名為「<a target="_blank" rel="noopener" href="https://timetable.nctu.edu.tw/?r=main/crsoutline&Acy=108&Sem=1&CrsNo=5220&lang=zh-tw"><strong><font color='blue'>電腦對局理論</font></strong></a>」的課，老師教了許多棋盤類相關遊戲的輸贏理論、各種狀態搜尋演算法，以及用 2048 遊戲的 AI 實作貫穿了整堂課，包含了 TD learning、n-tuple network、狀態搜尋等等，我覺得用 2048 這個遊戲來貫穿遊戲 AI 的永字八法真的太神了！</p>
+                <h1 id="從-2048-學習遊戲對局-AI-設計"><a href="#從-2048-學習遊戲對局-AI-設計" class="headerlink" title="從 2048 學習遊戲對局 AI 設計"></a>從 2048 學習遊戲對局 AI 設計</h1><p>在我大四的時候，我修了一門名為「<a target="_blank" rel="noopener" href="https://timetable.nctu.edu.tw/?r=main/crsoutline&Acy=108&Sem=1&CrsNo=5220&lang=zh-tw"><strong><font color='blue'>電腦對局理論</font></strong></a>」的課，老師教了許多棋盤類相關遊戲的輸贏理論、各種狀態搜尋演算法，以及用 2048 遊戲的 AI 實作貫穿了整堂課，包含了 TD learning、n-tuple network、狀態搜尋等等，我覺得用 2048 這個遊戲來貫穿遊戲 AI 的永字八法真的太神了！</p>
 <p>這篇用來記錄我吸收整理後的學習筆記，我非常非常推薦入門者也用 2048 這套教材學習。這門課真的讓人收穫滿滿，讚嘆吳毅成教授以及助教學長們~~</p>
 <h2 id="2048-遊戲規則"><a href="#2048-遊戲規則" class="headerlink" title="2048 遊戲規則"></a>2048 遊戲規則</h2><p>如果你還不熟悉 2048 的規則，可以直接在 <a target="_blank" rel="noopener" href="https://play2048.co/"><strong><font color='blue'>2048 的網頁</font></strong></a> 玩玩看。盤面上所有的磚塊上數值都是 $2$ 的冪次方 $(2^k)$，每次玩家都可以往「上、下、左、右」其中一個方向滑動盤面，滑動後所有磚塊都會往該方向併攏，如果有兩塊磚塊數值一樣 $(2^k)$ 被併攏在一起的話就會融合成一個新磚塊 $(2^{k+1})$，並且讓玩家賺到 $2^{k+1}$ 的分數。玩家完成滑動後，系統會在沒有磚塊的地方隨機生成一個數值為 $2$ 或 $4$ 的新磚塊，再讓玩家繼續下一輪的滑動，雙方反覆直到玩家再也沒辦法滑動盤面為止。</p>
 <p>遊戲結束時，所有合併磚塊時得到的分數加總起來就是玩家的分數了。在玩遊戲的過程中，會因為合併而不斷產生更大數值的方塊，例如 $1024、2048$ 甚至更大的數字，而隨著盤面上數值不同無法合併的磚塊愈來愈多，盤面就愈來愈容易被塞滿而結束，因此要如何一邊賺分數、一邊盡量不把盤面玩死，就是一大挑戰。本篇要介紹的就是如何設計一支「很會玩 2048 的AI」。</p>
@@ -157,13 +157,175 @@
 <h3 id="考慮前途地玩-2048"><a href="#考慮前途地玩-2048" class="headerlink" title="考慮前途地玩 2048"></a>考慮前途地玩 2048</h3><p>假設我們有一個神奇函數，只要把滑動後的盤面丟進去，它就能預估「出現這個盤面過後，還能夠再賺多少分數才會遊戲結束」，也就是所謂的「這個盤面多有前途」。有了這個函數的話，我們就能讓 agent 更聰明地選擇方向了，那就是永遠選擇「該次滑動賺的分數」加上「滑完的盤面預計還能賺的分數」最高的滑動方向。</p>
 <p><img src="https://i.imgur.com/NteLdRn.png"></p>
 <p>以上圖為例，往右滑能賺 $8$ 分，並且估計能再賺 $100$ 分才結束遊戲，因此往右滑能賺到的分數總共是 $108$；而往下滑能賺 $0$ 分，並且估計能再賺 $300$ 分才結束遊戲，因此往下滑能賺到的分數總共是 $300$，所以我們設計的 agent 該選擇往下滑。</p>
-<p>估算「前途」的函數愈準確，這個策略就會愈強大。至於這個神奇函數怎麼來，我們可以透過經驗來調整，而經驗怎麼累積，則是來自於一場又一場的遊戲。這就是所謂的強化學習！接下來我們將探討如何利用強化學習，訓練出能夠估算「某個盤面到死前還能賺多少分數」的函數。</p>
+<p>要注意的是，這個策略是完全仰賴估算「前途」的函數的，估算「前途」的函數愈準確，這個策略就會愈強大。至於這個神奇函數怎麼來，我們可以透過經驗來調整，而經驗怎麼累積，則是來自於一場又一場的遊戲。這就是所謂的強化學習！接下來我們將探討如何利用強化學習，訓練出能夠估算「某個盤面到死前還能賺多少分數」的函數。</p>
 <h2 id="估計「前途」的函數"><a href="#估計「前途」的函數" class="headerlink" title="估計「前途」的函數"></a>估計「前途」的函數</h2><p>想要準準地估算某個盤面還能再賺多少分才死，最好的方法就是看看這些盤面在實際的遊戲中究竟賺了幾分。</p>
 <p><img src="https://i.imgur.com/zapknF4.png"></p>
-<p>以上圖為例，假設上圖是某一局遊戲從開局到結束的過程，並且遊戲結束後總共賺了 987 分。有了這個數據，我們就能知道這局遊戲過程出現的每個盤面分別有多少「前途」了！</p>
+<p>以上圖為例，假設上圖是某一局遊戲從開局到結束的過程，並且遊戲結束後總共賺了 987 分。有了這個數據，我們就能知道這局遊戲過程出現的每個盤面分別有多少「前途」了！要注意的是我們只在乎「滑動後」的盤面有多少潛力，因為只有滑往什麼方向是我們可以決定的，系統要在哪裡跳出新磚塊不是我們能決定的。</p>
 <p><img src="https://i.imgur.com/oQuEHYh.png"></p>
-<p>舉例來說，在這場遊戲中，出現左下角兩塊 $2$ 之後又賺了 987 分才結束，我們把這個數據存下來，然後下次我們再遇到左下角有兩塊 $2$ 的盤面時，我們就可以估計這個盤面還能再賺 987 分！只要我們一直不斷地玩遊戲，蒐集所有出現過的盤面以及最後結果，我們就有愈來愈多的數據用來幫助我們預估每個盤面的潛力值。要注意的是我們只在乎「滑動後」的盤面的潛力值，因為只有滑往什麼方向是我們可以決定的，系統要在哪裡跳出新磚塊不是我們能決定的。</p>
-<h3 id="Temporal-difference-learning"><a href="#Temporal-difference-learning" class="headerlink" title="Temporal difference learning"></a>Temporal difference learning</h3><p>Temporal difference learning, 簡稱 TD learning，是reinforcement learning (強化學習) 的種類之一。關於 TD learning 的詳細說明，可以參考 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Temporal_difference_learning"><strong><font color='blue'>TD learning 的維基百科</font></strong></a>，簡而言之他的特色在於，每個狀態都把它在某場遊戲中的「下一個狀態」以及「兩者之間的分數差值」當成目標學習，而非把那場遊戲的最終狀態和分數當成目標。舉例來說，在某場遊戲中，agent 在第 $t$ 步賺了 $x$ 分並滑出 $A$ 盤面，在第 $t+1$ 步賺了 $y$ 分並滑出 $B$ 盤面，那麼對 $A$ 盤面來說，它的學習目標即為 $B$ 盤面的估計值加上 $y$，而非此場遊戲在出現 $A$ 盤面後的真正的賺分總合。</p>
+<p>舉例來說，在這場遊戲中，出現「左下角有兩塊 $2$」的盤面之後又賺了 987 分才結束；出現「左下角有 $2$ 和 $4$」的盤面之後又賺了 983 分才結束…等等，我們把這個數據存下來，然後下次我們再遇到「左下角有兩塊 $2$」的盤面時，我們就可以估計這個盤面還能再賺 987 分；或是下次再遇到「左下角有 $2$ 和 $4$」的盤面時，我們就可以估計這個盤面還能再賺 983 分！</p>
+<p>只要我們一直不斷地玩遊戲，蒐集所有出現過的盤面以及最後結果，我們就有愈來愈多的數據用來幫助我們在玩遊戲的過程中預估每個盤面的潛力值。而隨著經驗愈來愈多，我們的預估也會愈來愈準確，代表 agent 愈來愈聰明，所以蒐集到的遊戲數據也會愈來愈有參考價值。</p>
+<p>不過，一定會有相同的盤面在不同場遊戲中重複出現，並且得到不一樣的最終分數，這樣到底該用哪次的分數當估計值呢？舉例來說：</p>
+<p><img src="https://i.imgur.com/lYno1uf.png"></p>
+<p>同樣是「左下角有兩塊 $2$」的盤面，可能在三場不同的遊戲中有三種不同的賺分結果，那麼未來再次出現「左下角有兩塊 $2$」的盤面時，該估計它有多少前途呢? 10 分嗎？5000 分嗎？還是 150 分呢？又或是三者平均在一起的 1720 分呢？</p>
+<p>取平均數還算合理，不過缺點在於像 10 分或是 5000 分這種極端值會主導平均值；再者，因為 agent 會不斷吸取經驗幫助判斷，讓自己變得愈來愈「懂玩」，因此愈舊的遊戲數據愈不具參考價值，不應該讓所有數據等比例地平均。</p>
+<p>那麼有沒有更好的做法呢？我們可以設定一個 learning rate，然後每次獲得新的觀測值時，都把舊的預測值以新的觀測值為目標向前更新一小步，這跟 stochastic gradient descent 的更新 model 概念滿像的，一樣都是要往目標更新 learning rate 的一小步，不一樣的地方是這個演算法是沒有 model 的，而是直接對於每個盤面的值做更新，因此也不會有計算 gradient 的成分。</p>
+<p>應用在 2048 上，我們可以把所有盤面的潛力值初始化為 $0$，然後設定 learning rate 為 $0.1$。以「左下角有兩塊 $2$」的盤面為例：</p>
+<ul>
+<li>在某場遊戲中觀測到賺分為 10 時，我們就可把此盤面的潛力值更新為 $0+(10-0)*0.1=1$</li>
+<li>後來在某場遊戲中觀測到賺分為 5000 時，我們又可以把它的潛力值更新為 $1+(5000-1)*0.1=500.9$</li>
+<li>再後來在某場遊戲中觀測到賺分為 150 時，又可以把它的潛力值更新為 $500.9+(150-500.9)*0.1=465.81$</li>
+</ul>
+<p>往後再遇到新的觀測值時，還會再不斷更新下去，並且逐漸收斂成一個穩定又可信的值。這就是蒙地卡羅(Monte Carlo)法！蒙地卡羅法的精神就是不斷在隨機的環境中取得觀測結果，藉以推估某個動作或某個狀態會有怎麼樣的未來。以 2048 為例，儘管每次系統都會在不同的地方生成新方塊，使得每場遊戲的結果總是變幻莫測，我們也能夠透過每次玩完遊戲後取得的最終結果，當成觀測值來調整估計值。</p>
+<p>不過 2048 這個遊戲有個稍微不太適合蒙地卡羅法的地方，那就是玩 2048 的過程中不太會有「決定性的一步」，像是「玩出了這個盤面我就要大賺了」之類的；相反的，就算是同樣的盤面，最後玩出的分數也會忽高忽低，就像上圖舉的例子一樣。這會導致每個盤面的估計值都難以收斂，也難以變得可信。不過並非每個遊戲都會有這個問題，以圍棋或是西洋棋為例，那種「吃掉別人」或是「做出陣型」的盤面就是「決定性的一步」，通常都會導致差不多的結果(贏過對方)，因此依然很適合蒙地卡羅的。</p>
+<p><img src="https://i.imgur.com/zapknF4.png"></p>
+<p>我們再看一眼這個遊戲過程例子：當出現「左下角有兩塊 $2$」的盤面後，這場遊戲又賺了 987 分才結束，但我們現在不想迷信這個 987，因為我們認為「左下角有兩塊 $2$」並不會在每場遊戲都一直賺到987。那麼要更新「左下角有兩塊 $2$」的盤面的估計值時，該拿什麼當目標呢？我們可以試試「左下角有 $2$ 和 $4$」的盤面的估計值再加上 4！為什麼這是一個更好的目標，我們可以看看以下這兩種宣稱，哪種更為合理？</p>
+<ul>
+<li>玩出「左下角有兩塊 $2$」的盤面後，很容易導致賺到 987 分</li>
+<li>玩出「左下角有兩塊 $2$」的盤面後，很容易導致在下一步能賺 4 分並且滑成「左下角有 $2$ 和 $4$」的盤面</li>
+</ul>
+<p>後者較為合理，對吧！人生也是差不多的概念，若你十年後會成為億萬富翁，不一定是因為你今天特別做了什麼；但若你明天醒來有麵包當早餐，那就是因為你今天有記得去買。接下來我們來介紹以這個概念為核心的「Temporal difference learning」</p>
+<h3 id="Temporal-difference-learning"><a href="#Temporal-difference-learning" class="headerlink" title="Temporal difference learning"></a>Temporal difference learning</h3><p>Temporal difference learning, 簡稱 TD learning，是reinforcement learning (強化學習) 的種類之一。關於 TD learning 的詳細說明，可以參考 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Temporal_difference_learning"><strong><font color='blue'>TD learning 的維基百科</font></strong></a>，簡而言之他的特色在於，每個狀態都全然相信它的「下一個狀態」的估計值，並當成目標學習，而非把最終分數當成目標。舉例來說，在某場遊戲中，agent 在第 $t$ 步賺了 $r_{t}$ 分並滑出 $B_t$ 盤面，然後在第 $t+1$ 步賺了 $r_{t+1}$ 分並滑出 $B_{t+1}$ 盤面，那麼對 $B_t$ 盤面來說，它的學習目標即為 $B_{t+1}$ 盤面的估計值加上 $r_{t+1}$，而非此場遊戲在出現 $B_t$ 盤面後的真正的賺分總合。</p>
+<p>關於 TD learning 的特色和好處，它的 paper 中也有給一個不錯的例子</p>
+<blockquote>
+<p>Suppose you wish to predict the weather for Saturday, and you have some model that predicts Saturday’s weather, given the weather of each day in the week. In the standard case, you would wait until Saturday and then adjust all your models. However, when it is, for example, Friday, you should have a pretty good idea of what the weather would be on Saturday – and thus be able to change, say, Saturday’s model before Saturday arrives.</p>
+</blockquote>
+<p>意思是，假設你要訓練一個 model，根據前幾天的天氣來預測星期六的天氣。若不使用 TD learning，你就一定要等到實際星期六的天氣來臨才能知道 ground truth 為何，藉以更新 model。然而如果星期五已經揭曉是個大太陽，model 卻還會預測成暴風雨暴風雪，那就算還沒到星期六，你也能大概知道星期六和星期五會是類似的好天氣，並且這個 model 會把它錯估成壞天氣，所以你可以在這時就先調整 model，而不用真的等到星期六揭曉。這就是 TD learning 的精神！</p>
+<p>不過這樣講得好像會誤導成直接拿星期五的天氣當成星期六的天氣來當 ground truth，並不是這樣的。為了更透徹地了解 TD learning 如何運作，我們來一步一步探討每一個盤面如何使用 TD learning 更新估計值。</p>
+<p>請記得，不管是使用蒙地卡羅法還是 TD learning，訓練 AI 的順序都是：</p>
+<ul>
+<li>1.把所有的盤面潛力值初始化為 0</li>
+<li>2.玩一場遊戲</li>
+<li>3.用這場遊戲的數據，更新遊戲中出現過的每個盤面的潛力估計值</li>
+<li>4.用新的策略 (新的盤面潛力值) 再玩一場遊戲</li>
+</ul>
+<p>不斷重複 3 和 4，周而復始。</p>
+<p>為了方便理解，我們用這張簡化後的遊戲為例子來演示。這場遊戲只有 4 次滑動就結束，總共賺了 $2+0+4+2=8$ 分。一開始，所有盤面 $A, B, C, D$ 的估計值都是 $0$。注意我們在意「滑動後」的盤面。</p>
+<p><img src="https://i.imgur.com/pnHC23W.png"></p>
+<p>以下的更新中，我們使用 learning rate $lr = 0.1$</p>
+<p>首先，對於 $D$ 盤面來說，它是這場遊戲的最後一個盤面，沒有「下一個盤面」了，而且沒有再賺分就結束了，因此它的學習目標就是 $0$ 分。<br>因此更新 $V(D) \leftarrow 0+0.1*(0-0)=0$</p>
+<p><img src="https://i.imgur.com/YlxAx0K.png"></p>
+<p>接著，對於 $C$ 盤面來說，它在這場遊戲中的「下一個盤面」是 $D$ 盤面，並且是賺了 $2$ 分後成為 $D$ 盤面的，因此它的學習目標是 $2+V(D)$。注意，這個目標絲毫不管真正到結束後賺了幾分，它只全然相信 $V(D)$ 會是對的，又以目前的 $V(D)$ 值來說，$2+V(D)=2$。<br>因此更新 $V(C) \leftarrow 0+0.1*(2-0)=0.2$</p>
+<p><img src="https://i.imgur.com/OgVvND7.png"></p>
+<p>再來，對於 $B$ 盤面來說，它在這場遊戲中的「下一個盤面」是 $C$ 盤面，並且是賺了 $4$ 分後成為 $C$ 盤面的，因此它的學習目標是 $4+V(C)$。注意，這個目標絲毫不管真正到結束後賺了幾分，它只全然相信 $V(C)$ 會是對的，又以目前的 $V(C)$ 值來說，$4+V(C)=4.2$。<br>因此更新 $V(B) \leftarrow 0+0.1*(4.2-0)=0.42$</p>
+<p><img src="https://i.imgur.com/q5F7Uj1.png"></p>
+<p>最後，對於 $A$ 盤面來說，它在這場遊戲中的「下一個盤面」是 $B$ 盤面，並且是賺了 $0$ 分後成為 $B$ 盤面的，因此它的學習目標是 $0+V(B)$。注意，這個目標絲毫不管真正到結束後賺了幾分，它只全然相信 $V(B)$ 會是對的，又以目前的 $V(B)$ 值來說，$0+V(B)=0.42$。<br>因此更新 $V(A) \leftarrow 0+0.1*(0.42-0)=0.042$</p>
+<p><img src="https://i.imgur.com/dr7jWSU.png"></p>
+<p>如此一來就完成一輪的更新，可以帶著這個新策略去玩一場新的遊戲了！你可能會覺得很可疑，明明 $A$ 盤面過後賺了 $8$ 分才結束，現在卻只把 $V(A)$ 更新為 $0.042$ 沒問題嗎？不用擔心，這只是因為我們設定 learning rate 為 $0.1$ 所造成的，隨著更新的次數愈來愈多，盤面的估計值都會逐漸收斂成一個穩定可信的數字。learning rate 的大小如何選擇以及如何更新，就需要靠實驗來決定了。</p>
+<h2 id="TD-lambda"><a href="#TD-lambda" class="headerlink" title="TD-$\lambda$"></a>TD-$\lambda$</h2><p>我們來比較看看蒙地卡羅法和 TD learning 的特色。蒙地卡羅法每次用的都是「真正」的數據，但非常浮動；而 TD learning 相對穩定，但都是使用「傳來」的數據。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Variance</th>
+<th>Error</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Monte Carlo</td>
+<td>高</td>
+<td>無</td>
+</tr>
+<tr>
+<td>TD learning</td>
+<td>低</td>
+<td>有</td>
+</tr>
+</tbody></table>
+<p>這兩種沒有誰好誰壞，只有誰更適合某種遊戲。如果想要綜合兩種的特色，可以使用 TD-$\lambda$！TD learning 本來就有一個參數 $\lambda$ 來決定「多少比例考慮實際賺分的結果」，而蒙地卡羅法其實就是 TD-$1$，完全只考慮「實際賺分結果」；而剛才介紹的 TD learning 其實就是 TD-$0$，完全只考慮「下一個狀態」。</p>
+<p>當 $\lambda$ 介於 $0$ 和 $1$ 之間時，所有賺分和未來狀態的組合都會被考慮進去。</p>
+<p><img src="https://i.imgur.com/JnyPSAp.png"></p>
+<p>以這張圖為例，這場遊戲總共賺了 $a+b+c+d$ 分，而在 TD-$1$ (蒙地卡羅) 中，$A$ 盤面的學習目標即為 $b+c+d$；在 TD-$0$ 中，$A$ 盤面的學習目標即為 $b+V(B)$；在介於 $0$ 到 $1$ 之間的 TD-$\lambda$ 中，以下所有都會是目標：</p>
+<ul>
+<li>$b+V(B)$</li>
+<li>$b+c+V(C)$</li>
+<li>$b+c+d+V(D)$</li>
+<li>$b+c+d$</li>
+</ul>
+<p>而這些值會以 $\lambda$ 為比例組合起來，成為 $A$ 盤面的學習目標</p>
+<table>
+<thead>
+<tr>
+<th>項</th>
+<th>係數</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$b+V(B)$</td>
+<td>$1-\lambda$</td>
+</tr>
+<tr>
+<td>$b+c+V(C)$</td>
+<td>$\lambda*(1-\lambda)$</td>
+</tr>
+<tr>
+<td>$b+c+d+V(D)$</td>
+<td>$\lambda * \lambda * (1-\lambda)$</td>
+</tr>
+<tr>
+<td>$b+c+d$</td>
+<td>$\lambda * \lambda * \lambda$</td>
+</tr>
+</tbody></table>
+<p>$target(A) \leftarrow (1-\lambda)(b+V(B)) + (\lambda * (1-\lambda))(b+c+V(C)) + (\lambda * \lambda * (1-\lambda))(b+c+d+V(D)) + (\lambda * \lambda * \lambda)(b+c+d)$<br>$V(A) \leftarrow V(A)+lr*(target(A)-V(A))$</p>
+<p>每一項的係數，與後面所有項的係數和，都呈現 $(1-\lambda):\lambda$ 的比例。我們也可以觀察到，當 $\lambda=0$ 時，唯一的目標就是 $b+V(B)$；當 $\lambda=1$ 時，唯一的目標就是 $b+c+d$。</p>
+<p>我們來一步一步探討使用 $TD-\lambda$ 時要如何更新每個盤面的估計值。為了不要讓時間複雜度拉高到 $n^2$，可以使用動態規劃的技巧。我們先來看看相鄰的盤面的目標之間有什麼樣的關係，以盤面 $B$ 的學習目標 $target(B)$ 為例：</p>
+<table>
+<thead>
+<tr>
+<th>項</th>
+<th>係數</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$c+V(C)$</td>
+<td>$1-\lambda$</td>
+</tr>
+<tr>
+<td>$c+d+V(D)$</td>
+<td>$\lambda * (1-\lambda)$</td>
+</tr>
+<tr>
+<td>$c+d$</td>
+<td>$\lambda * \lambda$</td>
+</tr>
+</tbody></table>
+<p>再看一眼 $A$ 的學習目標 $target(A)$，是不是很眼熟呢？</p>
+<table>
+<thead>
+<tr>
+<th>項</th>
+<th>係數</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$b+V(B)$</td>
+<td>$1-\lambda$</td>
+</tr>
+<tr>
+<td>$b+$<font color='red'>$c+V(C)$</font></td>
+<td>$\lambda*$<font color='red'>$(1-\lambda)$</font></td>
+</tr>
+<tr>
+<td>$b+$<font color='red'>$c+d+V(D)$</font></td>
+<td>$\lambda *$<font color='red'>$\lambda * (1-\lambda)$</font></td>
+</tr>
+<tr>
+<td>$b+$<font color='red'>$c+d$</font></td>
+<td>$\lambda *$<font color='red'>$\lambda * \lambda$</font></td>
+</tr>
+</tbody></table>
+<p>我們可以發現 $target(B)$ 與 $target(A)$ 有著這樣的關係：<br>$target(A) = b+(1-\lambda) * V(B)+\lambda * target(B)$<br>這也是一場遊戲中所有相鄰盤面的目標之間的關係。</p>
+<p>我們再用剛才的例子來演示一次使用 TD-$\lambda$ 時如何更新每個盤面的估計值。我們使用 learning rate $lr = 0.1$，以及 $\lambda=0.3$。</p>
+<p><img src="https://i.imgur.com/pnHC23W.png"></p>
+<p>首先，對於 $D$ 盤面來說，它是這場遊戲的最後一個盤面，毫無懸念，它的學習目標就是 $0$ 分<br>$target(D) \leftarrow 0$<br>$V(D) \leftarrow 0+0.1*(0-0)=0$</p>
+<p><img src="https://i.imgur.com/wuRcvxP.png"></p>
+<p>接著，對於 $C$ 盤面來說，它賺了 $2$ 分後成為 $D$ 盤面，而它的學習目標 $target(C)$ 為 $d+(1-\lambda) * V(D) + \lambda * target(D)$，代入各項變數後可知<br>$target(C) \leftarrow 2 + 0.7 * 0 + 0.3 * 0=2$<br>$V(C) \leftarrow 0+0.1*(2-0)=0.2$</p>
+<p><img src="https://i.imgur.com/KtYpB8A.png"></p>
+<p>再來，對於 $B$ 盤面來說，它賺了 $4$ 分後成為 $C$ 盤面，而它的學習目標 $target(B)$ 為 $c+(1-\lambda) * V(C) + \lambda * target(C)$，代入各項變數後可知<br>$target(B) \leftarrow 4 + 0.7 * 0.2 + 0.3 * 2 = 4.74$<br>$V(B) \leftarrow 0+0.1*(4.74-0)=0.474$</p>
+<p><img src="https://i.imgur.com/JzeqezG.png"></p>
+<p>最後，對於 $A$ 盤面來說，它賺了 $0$ 分後成為 $B$ 盤面，而它的學習目標 $target(A)$ 為 $b+(1-\lambda) * V(B) + \lambda * target(B)$，代入各項變數後可知<br>$target(A) \leftarrow 0 + 0.7 * 0.474 + 0.3 * 4.74 = 1.7538$<br>$V(A) \leftarrow 0+0.1*(1.7538-0)=0.17538$</p>
+<p><img src="https://i.imgur.com/Wch5WoJ.png"></p>
+<p>如此一來就完成一輪更新了！$\lambda$ 的選擇也會影響著訓練出來的 AI 有多強多弱，而這也要靠實驗才能得知最適合的參數了！</p>
 <h2 id="N-tuple-network"><a href="#N-tuple-network" class="headerlink" title="N-tuple network"></a>N-tuple network</h2><h2 id="遊戲狀態搜尋"><a href="#遊戲狀態搜尋" class="headerlink" title="遊戲狀態搜尋"></a>遊戲狀態搜尋</h2>
             </div>
 

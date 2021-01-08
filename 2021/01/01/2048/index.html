@@ -184,7 +184,7 @@
 <li>玩出「左下角有兩塊 $2$」的盤面後，很容易導致在下一步能賺 4 分並且滑成「左下角有 $2$ 和 $4$」的盤面</li>
 </ul>
 <p>後者較為合理，對吧！人生也是差不多的概念，若你十年後會成為億萬富翁，不一定是因為你今天特別做了什麼；但若你明天醒來有麵包當早餐，那就是因為你今天有記得去買。接下來我們來介紹以這個概念為核心的「Temporal difference learning」</p>
-<h3 id="Temporal-difference-learning"><a href="#Temporal-difference-learning" class="headerlink" title="Temporal difference learning"></a>Temporal difference learning</h3><p>Temporal difference learning, 簡稱 TD learning，是reinforcement learning (強化學習) 的種類之一。關於 TD learning 的詳細說明，可以參考 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Temporal_difference_learning"><strong><font color='blue'>TD learning 的維基百科</font></strong></a>，簡而言之他的特色在於，每個狀態都全然相信它的「下一個狀態」的估計值，並當成目標學習，而非把最終分數當成目標。舉例來說，在某場遊戲中，agent 在第 $t$ 步賺了 $r_{t}$ 分並滑出 $B_t$ 盤面，然後在第 $t+1$ 步賺了 $r_{t+1}$ 分並滑出 $B_{t+1}$ 盤面，那麼對 $B_t$ 盤面來說，它的學習目標即為 $B_{t+1}$ 盤面的估計值加上 $r_{t+1}$，而非此場遊戲在出現 $B_t$ 盤面後的真正的賺分總合。</p>
+<h3 id="Temporal-difference-learning"><a href="#Temporal-difference-learning" class="headerlink" title="Temporal difference learning"></a>Temporal difference learning</h3><p>Temporal difference learning, 簡稱 TD learning，是reinforcement learning (強化學習) 的種類之一。關於 TD learning 的詳細說明，可以參考 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Temporal_difference_learning"><strong><font color='blue'>TD learning 的維基百科</font></strong></a>，簡而言之他的特色在於，依據目前的模型對於其他相關狀態的預測來達成學習，而非等到確切結果揭曉。</p>
 <p>關於 TD learning 的特色和好處，它的 paper 中也有給一個不錯的例子</p>
 <blockquote>
 <p>Suppose you wish to predict the weather for Saturday, and you have some model that predicts Saturday’s weather, given the weather of each day in the week. In the standard case, you would wait until Saturday and then adjust all your models. However, when it is, for example, Friday, you should have a pretty good idea of what the weather would be on Saturday – and thus be able to change, say, Saturday’s model before Saturday arrives.</p>
@@ -198,8 +198,8 @@
 <li>3.用這場遊戲的數據，更新遊戲中出現過的每個盤面的潛力估計值</li>
 <li>4.用新的策略 (新的盤面潛力值) 再玩一場遊戲</li>
 </ul>
-<p>不斷重複 3 和 4，周而復始。</p>
-<p>為了方便理解，我們用這張簡化後的遊戲為例子來演示。這場遊戲只有 4 次滑動就結束，總共賺了 $2+0+4+2=8$ 分。一開始，所有盤面 $A, B, C, D$ 的估計值都是 $0$。注意我們在意「滑動後」的盤面。</p>
+<p>不斷重複 3 和 4，直到收斂。</p>
+<p>為了方便理解，我們用這張簡化後的遊戲為例子來演示。這場遊戲只有 4 次滑動就結束，總共賺了 $2+0+4+2=8$ 分。一開始，所有盤面 $A, B, C, D$ 的估計值都是 $0$。注意，我們只在意「滑動後」的盤面。</p>
 <p><img src="https://i.imgur.com/pnHC23W.png"></p>
 <p>以下的更新中，我們使用 learning rate $lr = 0.1$</p>
 <p>首先，對於 $D$ 盤面來說，它是這場遊戲的最後一個盤面，沒有「下一個盤面」了，而且沒有再賺分就結束了，因此它的學習目標就是 $0$ 分。<br>因此更新 $V(D) \leftarrow 0+0.1*(0-0)=0$</p>

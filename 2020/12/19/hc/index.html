@@ -61,7 +61,7 @@
     <script src="/js/util.js"></script>
     <script src="/js/main.js"></script>
 	
-<meta name="generator" content="Hexo 5.3.0"></head>
+<meta name="generator" content="Hexo 5.3.0"><link rel="stylesheet" href="/css/prism-dark.css" type="text/css"></head>
     
 		
 <!-- Layouts -->
@@ -69,8 +69,9 @@
 
 
 <!--  代码渲染  -->
-<link rel="stylesheet" href="/css/prism_coy.css" />
+<link rel="stylesheet" href="/css/prism_okaidia.css" />
 <link rel="stylesheet" href="/css/typo.css" />
+
 <!-- 文章页 -->
 <body class="is-loading">
     <!-- Wrapper 外包 s-->
@@ -160,7 +161,7 @@
 <h3 id="Requests-請求"><a href="#Requests-請求" class="headerlink" title="Requests 請求"></a>Requests 請求</h3><p>我們收到了一堆請求(至多1000000個)，每一個請求都闡述了「某個客戶端」要獲取「某部影片」總共「多少次」</p>
 <h3 id="我們要進行的操作"><a href="#我們要進行的操作" class="headerlink" title="我們要進行的操作"></a>我們要進行的操作</h3><p>我們要做的事情是：「對於每一個快取伺服器，決定要放哪些影片進去」，每部影片都可以重複放在不同的伺服器裡，但每個快取伺服器所含的影片的檔案大小總和不能超過快取伺服器的容量限制。</p>
 <p>一旦我們將某部影片放進某個快取伺服器後，有和該伺服器連線的客戶端就可以從這個伺服器拿影片了，因此如果該客戶端和該伺服器之間的傳輸時間很短，這個操作就能讓該客戶端大量減少拿這部影片的時間。</p>
-<p>我們的目標就是盡量減少客戶端拿影片的時間。</p>
+<p>我們的目標就是考慮所有請求 (request)，盡量減少每個請求中客戶端拿影片的時間。</p>
 <h3 id="計分"><a href="#計分" class="headerlink" title="計分"></a>計分</h3><p>當我們決定好每一個快取伺服器要包含哪些影片之後，就可以計算我們總共省下了多少時間。</p>
 <p>對於每一個請求(用戶端、影片、次數)，原本所需要花的時間就是該用戶端從資料中心拿影片的時間，乘以次數，稱為 $T$</p>
 <p>假設我們的答案裡，某些伺服器擁有該影片，那麼現在所需要花的時間則是該用戶端從「有和它連線」且「傳輸給它所需時間最少」的伺服器拿影片的時間，乘以次數，稱為 $t$</p>
@@ -297,40 +298,30 @@
 <p>那麼當$V_0$還沒放進任何快取時，$V_0C_0$所帶來的效益是$50$ (可能有許多客戶想從$C_0$獲取$V_0$！)<br>但如果$V_0$已經存在快取$C_1$了，那麼$V_0C_0$所帶來的效益就只有$20$了 (可能有許多客戶已經滿足於從 $C_1$ 拿影片了，只剩一些客戶會受益於從 $C_0$ 拿影片)</p>
 <p>因此計算效益時要基於「目前已選$S$」，而我的 Greedy 策略就是基於$S_t$不斷選擇$R(S_t, V_iC_j)$值最大的$V_iC_j$，並將他併入$S_t$中，重複直到再也沒有$V_iC_j$值得選為止。</p>
 <p>以下是這個 Greedy 演算法的 Pseudo code:</p>
-<ul>
-<li>$S_t$ 初始化為 $[]$</li>
-<li>$WaitingList$ 初始化為所有「影片對快取」的組合 $[V_iC_j|0\leq i \leq N_v, 0 \leq j \leq N_c]$</li>
-<li>重複迴圈:<ul>
-<li>對於每個 $V_iC_j \in WaitingList$，計算 $R(S_t, V_iC_j)$ </li>
-<li>若所有的 $R(S_t, V_iC_j)$ 都不大於$0$，則結束迴圈</li>
-<li>選出 $R(S_t, V_iC_j)$ 最大的 $V_xC_y$</li>
-<li>$S_t$ 更新為 $S_t \cup V_xC_y$</li>
-<li>把 $V_xC_y$ 移出 $WaitingList$</li>
-</ul>
-</li>
-<li>回傳 $S_t$ 即為答案</li>
-</ul>
+<pre class="line-numbers language-none"><code class="language-none">St 初始化為空集合 &#123;&#125;
+WaitingList 初始化為所有「影片對快取」的組合 &#123;ViCj | 0 ≤ i ≤ Nv, 0 ≤ j ≤ Nc&#125;
+重複迴圈: &#x2F;&#x2F; 尋找最好的 VxCy
+    對於每個 ViCj ∈ WaitingList，計算 R(St, ViCj) 
+    若所有的 R(St, ViCj) 都不大於 0，則結束迴圈
+    選出 R(St, ViCj) 最大的 VxCy
+    St 更新為 St ∪ VxCy
+    把 VxCy 移出 WaitingList
+回傳 St 即為答案<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>演算法本身的觀念還滿簡單的，但如果沒有特別處理的話，複雜度其實大得滿崩潰的，因為每算一個 $R(S_t, V_iC_j)$ 時都要遍歷所有的 request、所有的快取、所有的影片等等。雖然程式運算時間不影響評分，但寫出跑得慢的程式還是令人煩惱，因此我有特別費心處理資料結構，例如維護每個 request 目前是從哪個 cache 拿影片最快、維護每個影片分別影響哪些 request 等等。這樣一來計算單一 $R(S_t, V_iC_j)$ 的時間就可以大幅減少。</p>
 <h3 id="Efficiency-Improvement-Use-Priority-Queue"><a href="#Efficiency-Improvement-Use-Priority-Queue" class="headerlink" title="Efficiency Improvement - Use Priority Queue"></a>Efficiency Improvement - Use Priority Queue</h3><p>還有一個很棘手的問題是「對於每個 $V_iC_j \in WaitingList$ 都重新計算 $R(S_t, V_iC_j)$」太花時間，畢竟影片最多有一萬部，快取最多有一千個。不過因為每一輪我只在乎「哪個 $R(S_t,V_iC_j)$ 值最大」，所以我並沒有真的每次都把所有組合的 reward 值算出來，而是用 Priority queue 來維護每個 $V_iC_j$ 對應的 reward 值。</p>
 <p>Priority Queue (PQ) 其實就是 Heap，就是個可以在 $O(logn)$ 時間取出最大值的 STL 容器。順道一提我實作所用的程式語言是 C++。<br>我會選擇使用 Priority Queue 來處理這個問題的原因有兩個：<br>1. 每一輪都只需知道「誰是最大值」<br>2. 對於所有的 $V_iC_j$ 而言，每經過一輪，它的 reward 值 $R(S_t, V_iC_j)$ 永遠都只會不變或遞減</p>
-<p>由於我使用了 PQ 取代一般的二維陣列來儲存 $R(S_t, V_iC_j)$ ，並且只關注PQ.top，因此最需要擔心的是裡面的 $R(S_t, V_iC_j)$ 隨著 $S_t$ 的更新變得 outdated。然而因為 reward 遞減的性質，我完全可以只確認 PQ.top 是否 up to date 就好，如果 PQ.top 是 up to date 的，儘管其他在 PQ 裡的值是 outdated 的，我也能夠確定 PQ.top 就是我要的最大值。這樣一來，就可以大量省下重新計算所有 $R(S_t, V_iC_j)$ 的時間。</p>
+<p>由於我使用了 PQ 取代一般的二維陣列來儲存 $R(S_t, V_iC_j)$ ，並且只關注PQ.top，因此最需要擔心的是裡面的 $R(S_t, V_iC_j)$ 隨著 $S_t$ 的更新變得 outdated。然而因為 reward 遞減的性質，我完全可以只確認 PQ.top 是否 up-to-date 就好，如果 PQ.top 是 up-to-date 的，儘管其他在 PQ 裡的值是 outdated 的，我也能夠確定 PQ.top 就是我要的最大值。這樣一來，就可以大量省下重新計算所有 $R(S_t, V_iC_j)$ 的時間。</p>
 <p>以下是這個 Greedy 演算法配上 PQ 的 Pseudo code:</p>
-<ul>
-<li>$S_t$ 初始化為 $[]$</li>
-<li>把所有「影片對快取」的組合 $[V_iC_j|0\leq i \leq N_v, 0 \leq j \leq N_c]$ 放進 PQ</li>
-<li>重複迴圈:<ul>
-<li>重複迴圈：<ul>
-<li>從 PQ.top 拿出 $V_xC_y$</li>
-<li>重新計算 $R(S_t, V_xC_y)$ </li>
-<li>若新的 $R(S_t, V_xC_y)$ 等於 PQ.top 的值，則帶著此 $V_xC_y$ 離開此迴圈</li>
-<li>否則，將新的 $R(S_t, V_xC_y)$ 放回PQ，繼續迴圈</li>
-</ul>
-</li>
-<li>$S_t$ 更新為 $S_t \cup V_xC_y$</li>
-</ul>
-</li>
-<li>回傳 $S_t$ 即為答案</li>
-</ul>
+<pre class="line-numbers language-none"><code class="language-none">St 初始化為空集合 &#123;&#125;
+把所有「影片對快取」的組合 &#123;ViCj | 0 ≤ i ≤ Nv, 0 ≤ j ≤ Nc&#125; 放進 PQ
+重複迴圈: &#x2F;&#x2F; 尋找最好的 VxCy
+    重複迴圈： &#x2F;&#x2F; 尋找第一個 up-to-date 的 PQ.top
+        從 PQ.top 拿出 VxCy
+        重新計算 R(St, VxCy) 
+        若新的 R(St, VxCy) 等於 PQ.top 的值，則帶著此 VxCy 離開此迴圈
+        否則，將新的 R(St, VxCy) 放回PQ，繼續迴圈
+    St 更新為 St ∪ VxCy
+回傳 St 即為答案<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>至此，程式已經能跑得又快又好了，不過為了更高分我還加了一些修改。</p>
 <h3 id="Unit-Reward"><a href="#Unit-Reward" class="headerlink" title="Unit Reward"></a>Unit Reward</h3><p>我的 Greedy 策略永遠是很貪心地選擇讓 Immediate reward 最大的 $V_iC_j$，完全不顧可能留下的爛攤子，像是拿到 size 太大的影片一下就把快取佔滿等等。</p>
 <p><img src="https://i.imgur.com/pRHewLW.png"></p>

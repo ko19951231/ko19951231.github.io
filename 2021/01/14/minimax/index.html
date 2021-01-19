@@ -143,10 +143,44 @@
             </div>
             <!-- Post -->
             <div class="typo" style="padding: 3rem;">
-                <h1 id="Minimax-search-與-Alpha-beta-剪枝"><a href="#Minimax-search-與-Alpha-beta-剪枝" class="headerlink" title="Minimax search 與 Alpha-beta 剪枝"></a>Minimax search 與 Alpha-beta 剪枝</h1><pre class="line-numbers language-none"><code class="language-none">int n;
-for(int i&#x3D;0;i&lt;3;i++)&#123;
-	n +&#x3D; i;
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+                <h1 id="Minimax-search-與-Alpha-beta-剪枝"><a href="#Minimax-search-與-Alpha-beta-剪枝" class="headerlink" title="Minimax search 與 Alpha-beta 剪枝"></a>Minimax search 與 Alpha-beta 剪枝</h1><p>Minimax search 是一種狀態搜尋演算法，在遊戲對局 AI 設計中時常會用到。如果你有玩五子棋、象棋、西洋棋等等的經驗，你在下棋的過程中是不是常在腦內有這樣的小劇場呢：「如果我動了這步，他大概會走甲或走乙。如果他走甲的話，那輪到我的時候我可以這樣；如果他走乙的話，那輪到我的時候我可以那樣…」，為了讓自己能做出最正確的選擇，要不斷地在對方的角度和自己的角度切換來切換去，試想看看當下的情況有哪些做法可選、最好的做法是什麼。這個「小劇場」的邏輯在遊戲對局 AI 的設計上也非常有用，而這個演算法的名字就叫做 minimax search。</p>
+<p>這篇將會介紹 minimax search，一步一步演示 minimax search 過程的脈絡，以及介紹一個可以減短搜尋過程的技法 — alpha-beta 剪枝。</p>
+<h2 id="Minimax-search-的適用情境"><a href="#Minimax-search-的適用情境" class="headerlink" title="Minimax search 的適用情境"></a>Minimax search 的適用情境</h2><p>minimax search 適用的情況必須符合三個條件：</p>
+<ul>
+<li>1.遊戲是零和遊戲，我愈賺，對方一定愈虧；我愈虧，對方一定愈賺</li>
+<li>2.遊戲資訊完全公開透明，沒有可隱瞞的</li>
+<li>3.雙方都以最佳的策略行動，沒有任何「隨機、賭賭看」的成分，完全可以正確預測出對方的行動</li>
+</ul>
+<p>舉例來說，像是排七(接龍)就不適合，因為看不到對手的牌，而且某些舉動可以利人利己或害人害己；像是大富翁也不適合，因為包含了擲骰子的隨機成分，完全無法預測對方，連自己的行為也無法掌握。</p>
+<p>像是雙人橋牌的打牌階段就很適合了，己方多吃一墩時，對方就少吃一墩，反之亦然，而且雙方都知道對方有哪些牌，也大致上都會照著最佳策略行動；許多棋類遊戲例如五子棋或是西洋棋、象棋也很適合，因為一旦自己露出破綻時，對方一定不會手下留情。不過棋類比較麻煩的地方是只有輸贏、沒有分數，但搜尋時卻又難以直接搜到輸贏結果，頂多搜到「吃掉、被吃掉」等等，因此還必須要另外設計把「吃掉、被吃掉」量化成「分數」的機制，才能讓 minimax search 派上用場。</p>
+<h2 id="比較"><a href="#比較" class="headerlink" title="比較"></a>比較</h2><p>醜話要先說在前頭，minimax search 一定會是指數級的演算法。因為適用於 minimax search 的遊戲狀態種類的組合數量就是指數級，而搜尋的過程必須把所有可能都列舉出來，因此複雜度絕對逃不了指數級。也就是因為複雜度這麼要命，才會需要 alpha-beta 剪枝這個技法。</p>
+<p><img src="https://i.imgur.com/O8F9vof.png"><br>看看這個西洋棋盤，總共 $64$ 格，每一格有 $6+6+1$ 種可能，因此盤面總共約有 $7^{64}$ 種。或也可以算成總共有 $32$ 個棋子，每一個棋子的位置有 $64+1$ 種可能，因此盤面共約有 $65^{32}$。無論哪一種，都是令人頭痛的指數級。</p>
+<p>不過，一想到「零和遊戲、雙方都最佳策略」這些關鍵字，你會不會立刻就想到經典問題「Nim game」以及 leetcode 經典 DP 題目「Stone game」系列呢？他們究竟有什麼特質，可以不用指數級的 minimax search，而是可以被 Polynomial time 的演算法解決呢？</p>
+<p>先來討論較為直觀的 stone game 系列。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://leetcode.com/problems/stone-game-vii/"><strong><font color='blue'>Stone game 系列之 VII</font></strong></a>：有 N 疊石頭，Alice 和 Bob 輪流除去最左或最右的整疊石頭，並得到值為「剩下所有石頭數量加總」的分數。目標是最大化「己方總分減對方總分」</p>
+</blockquote>
+<p>雖然雙方每次都有兩種動作可以選，遊戲狀態組合看似會以 $2^N$ 增長，但實際上狀態們都會不斷重複出現，以 stone game VII 為例，「剩餘石頭堆的起始位置和結束位置」只會有 $N^2$ 種可能，因此只要利用 DP 把每一種對應的答案用表格存起來，就能把複雜度控制在 $N^2$。再看看適用 minimax search 的遊戲，儘管我們也能使出 DP 大法，把每個狀態對應的答案用表格存起來，但因為狀態的數量是指數級，表格的大小也會是指數級，所以還是避免不了指數級時間複雜度。</p>
+<p>再來討論較為玄學的 Nim game 系列。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Nim"><strong><font color='blue'>Nim game</font></strong></a>：有 N 疊石頭，Alice 和 Bob 輪流選取某一疊，並除去那一疊中任意數量的石頭，拿走最後一顆石頭的人獲勝</p>
+</blockquote>
+<p>Nim game 的遊戲狀態數量其實是指數級的：每一疊石頭最多有 $k$ 個，總共有 $N$ 疊石頭的話，遊戲狀態就有 $(k+1)^N$ 種。</p>
+<p>這種遊戲的特質為：只有輸贏沒有分數、而且不管輪到誰能做的動作都一樣、不會出現循環的盤面。因此盤面之間有這樣的遞迴規則：</p>
+<ul>
+<li>1.不能動的盤面，為「必敗」盤面 (輪到誰誰輸)</li>
+<li>2.可以動一步就成為必敗盤面的盤面，為「必勝」盤面 (輪到誰誰贏)</li>
+<li>3.任何動一步都只能成為必勝盤面的盤面，為「必敗」盤面 (輪到誰誰輸)</li>
+</ul>
+<p>不過經由神奇的數學研究，解 Nim game 不需要真的把所有狀態列出來搜尋，而是只要把每一疊石頭的數量 XOR 起來，若是 0 就是必敗盤面 (輪到誰誰輸)，否則就是必勝盤面 (輪到誰誰贏)！你可以簡單驗證看看：</p>
+<ul>
+<li>1.不能動的局面，亦即沒有半顆石頭的局面，XOR 值為0</li>
+<li>2.任何 XOR 不為 0 的局面，都可以藉由一步操作變成 XOR 為 0 的局面</li>
+<li>3.任何 XOR 為 0 的局面，任何一步操作都只能成為 XOR 不為 0 的局面</li>
+</ul>
+<p>不只是 Nim game 本身，所有有上述特質的遊戲，都能轉換成等價的「N 疊石頭」，並用 XOR 算出必勝或必敗。這個神奇理論稱為「SG 定理」，而「轉換」的動作稱為「SG 函數」，如果有興趣的話，可以搜尋「SG 定理」相關的資料，也可以參考看看 <a target="_blank" rel="noopener" href="https://slides.com/ko19951231/combinational"><strong><font color='blue'>我 2017 時寫的投影片</font></strong></a>，裡面有簡單的 SG 定理證明以及一些範例。簡而言之，這類型的遊戲如果能在 polynomial time 的時間算出 SG 值，總體的時間複雜度就也會是 polynomial time，不須用指數級的時間搜尋。再看看適用於 minimax search 的遊戲，由於雙方能對盤面做的動作不同 (只能動白子、只能動黑子)，所以無法用這個方法解決。</p>
+<p>比較完這兩種可以避開指數級搜尋的遊戲系列，來正式介紹 minimax search 吧！</p>
+
             </div>
 
             <!-- Post Comments -->

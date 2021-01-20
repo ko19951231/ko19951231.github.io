@@ -152,9 +152,9 @@
 <li>3.雙方都以最佳的策略行動，沒有任何「隨機、賭賭看」的成分，完全可以正確預測出對方的行動</li>
 </ul>
 <p>舉例來說，像是排七(接龍)就不適合，因為看不到對手的牌，而且某些舉動可以利人利己或害人害己；像是大富翁也不適合，因為包含了擲骰子的隨機成分，完全無法預測對方，連自己的行為也無法掌握。</p>
-<p>像是雙人橋牌的打牌階段就很適合了，己方多吃一墩時，對方就少吃一墩，反之亦然，而且雙方都知道對方有哪些牌，也大致上都會照著最佳策略行動；許多棋類遊戲例如五子棋或是西洋棋、象棋也很適合，因為一旦自己露出破綻時，對方一定不會手下留情。不過棋類比較麻煩的地方是只有輸贏、沒有分數，但搜尋時卻又難以直接搜到輸贏結果，頂多搜到「吃掉、被吃掉」等等，因此還必須要另外設計把「吃掉、被吃掉」量化成「分數」的機制，才能讓 minimax search 派上用場。</p>
+<p>像是雙人橋牌的打牌階段就很適合了，己方多吃一墩時，對方就少吃一墩，反之亦然，而且雙方都知道對方有哪些牌，也大致上都會照著最佳策略行動；許多棋類遊戲例如五子棋或是西洋棋、象棋也很適合，因為一旦自己露出破綻時，對方一定不會手下留情。不過棋類比較麻煩的地方是只有輸贏、沒有分數，但搜尋時卻又難以直接搜到輸贏結果，頂多搜到「吃掉、被吃掉」等等，因此還必須要另外設計把「吃掉、被吃掉」量化成「分數」的 heuristic，才能讓 minimax search 派上用場。</p>
 <h2 id="比較"><a href="#比較" class="headerlink" title="比較"></a>比較</h2><p>醜話要先說在前頭，minimax search 一定會是指數級的演算法。因為適用於 minimax search 的遊戲狀態種類的組合數量就是指數級，而搜尋的過程必須把所有可能都列舉出來，因此複雜度絕對逃不了指數級。也就是因為複雜度這麼要命，才會需要 alpha-beta 剪枝這個技法。</p>
-<p><img src="https://i.imgur.com/O8F9vof.png"><br>看看這個西洋棋盤，總共 $64$ 格，每一格有 $6+6+1$ 種可能，因此盤面總共約有 $7^{64}$ 種。或也可以算成總共有 $32$ 個棋子，每一個棋子的位置有 $64+1$ 種可能，因此盤面共約有 $65^{32}$。無論哪一種，都是令人頭痛的指數級。</p>
+<p><img src="https://i.imgur.com/O8F9vof.png"><br>看看這個西洋棋盤，總共 $64$ 格，每一格有 $6+6+1$ 種可能，因此盤面總共約有 $13^{64}$ 種。或也可以算成總共有 $32$ 個棋子，每一個棋子的位置有 $64+1$ 種可能，因此盤面共約有 $65^{32}$。無論哪一種，都是令人頭痛的指數級。</p>
 <p>不過，一想到「零和遊戲、雙方都最佳策略」這些關鍵字，你會不會立刻就想到經典問題「Nim game」以及 leetcode 經典 DP 題目「Stone game」系列呢？他們究竟有什麼特質，可以不用指數級的 minimax search，而是可以被 Polynomial time 的演算法解決呢？</p>
 <p>先來討論較為直觀的 stone game 系列。</p>
 <blockquote>
@@ -172,16 +172,76 @@
 <li>2.可以動一步就成為必敗盤面的盤面，為「必勝」盤面 (輪到誰誰贏)</li>
 <li>3.任何動一步都只能成為必勝盤面的盤面，為「必敗」盤面 (輪到誰誰輸)</li>
 </ul>
-<p>不過經由神奇的數學研究，解 Nim game 不需要真的把所有狀態列出來搜尋，而是只要把每一疊石頭的數量 XOR 起來，若是 0 就是必敗盤面 (輪到誰誰輸)，否則就是必勝盤面 (輪到誰誰贏)！舉例來說，如果總共有三疊石頭，分別是「6顆、5顆、3顆」，那麼這時輪到誰，誰就輸定了！$(6⊕5⊕3=0)$</p>
+<p>不過經由神奇的數學研究，解 Nim game 不需要真的把所有狀態列出來搜尋，而是只要把每一疊石頭的數量 XOR 起來，若是 0 就是必敗盤面 (輪到誰誰輸)，否則就是必勝盤面 (輪到誰誰贏)！舉例來說，如果總共有三疊石頭，分別是「6顆、5顆、3顆」，那麼這時輪到誰，誰就輸定了！因為 $6⊕5⊕3=0$</p>
 <p>你可以簡單驗證看看：</p>
 <ul>
 <li>1.不能動的局面，亦即沒有半顆石頭的局面，XOR 值為0</li>
-<li>2.任何 XOR 不為 0 的局面，都可以藉由一步操作變成 XOR 為 0 的局面</li>
-<li>3.任何 XOR 為 0 的局面，任何一步操作都只能成為 XOR 不為 0 的局面</li>
+<li>2.任何 XOR 不為 0 的局面，都可以藉由減少某一疊的石頭數，變成 XOR 為 0 的局面</li>
+<li>3.任何 XOR 為 0 的局面，減少任何一疊的石頭數，都只能成為 XOR 不為 0 的局面</li>
 </ul>
 <p>不只是 Nim game 本身，所有有上述特質的遊戲，都能轉換成等價的「N 疊石頭」，並用 XOR 算出必勝或必敗。這個神奇理論稱為「SG 定理」，而「轉換」的動作稱為「SG 函數」，如果有興趣的話，可以搜尋「SG 定理」相關的資料，也可以參考看看 <a target="_blank" rel="noopener" href="https://slides.com/ko19951231/combinational"><strong><font color='blue'>我 2017 時寫的投影片</font></strong></a>，裡面有簡單的 SG 定理證明以及一些範例。簡而言之，這類型的遊戲如果能在 polynomial time 的時間算出 SG 值，總體的時間複雜度就也會是 polynomial time，不須用指數級的時間搜尋。再看看適用於 minimax search 的遊戲，由於雙方能對盤面做的動作不同 (只能動白子、只能動黑子)，所以無法用這個方法解決。</p>
 <p>比較完這兩種可以避開指數級搜尋的遊戲系列，來正式介紹 minimax search 吧！</p>
-
+<h2 id="Minimax-search-簡單的例子"><a href="#Minimax-search-簡單的例子" class="headerlink" title="Minimax search 簡單的例子"></a>Minimax search 簡單的例子</h2><h3 id="兩層搜尋"><a href="#兩層搜尋" class="headerlink" title="兩層搜尋"></a>兩層搜尋</h3><p>夜市裡有個攤販老闆擺出了兩個盒子，每個盒子裡面有兩張紙條，每張紙條上面寫著一個金額。你可以任意選擇一個盒子，再讓老闆從你選的盒子中挑一張紙條，成為你能夠贏得的獎金。你想盡量拿到最多的獎金，老闆想盡量讓你拿到最少的獎金，互相制衡之下，你能夠拿多少獎金呢？<br><img src="https://i.imgur.com/r4nsBFG.png"><br>如果我們挑了甲盒子，老闆一定會選 80 的紙條；如果我們挑了乙盒子，老闆一定會選 50 的紙條。因此，我們要挑甲盒子，而 80 就是我們能拿到的獎金！儘管乙盒子裡面有一萬元獎金，我們也不能挑乙盒子，因為我們知道老闆一定不會選擇一萬元獎金紙條，我們看得到卻吃不到。<br><img src="https://i.imgur.com/HBupmMP.png"><br>如上圖，<font color='green'>綠色是老闆的選擇</font>，<font color='red'>紅色是我們的選擇</font>。我們也可以將選擇的過程用樹狀圖來表示：<br><img src="https://i.imgur.com/e8ZZGhl.png"></p>
+<h3 id="三層搜尋"><a href="#三層搜尋" class="headerlink" title="三層搜尋"></a>三層搜尋</h3><p><img src="https://i.imgur.com/KYPh67I.png"></p>
+<p>現在我們更改一下遊戲規則：我們可以從 A、B 兩個袋子中挑一個，老闆從我們挑的袋子中選一個盒子，我們再從老闆選的盒子中挑一張紙條。雙方制衡之下，我們能拿到多少獎金呢？</p>
+<p>我們可以先預想看看，每個盒子如果被老闆挑到，我們可以選哪張紙條，如下圖紅圈處。哇，丙盒子有兩萬元呢，如果老闆挑到丙盒子就太好了！</p>
+<p><img src="https://i.imgur.com/1LYf1yz.png"></p>
+<p>然而老闆早就看透了我們的心思，知道我們會選哪張紙條，因此在甲和乙中，老闆會選擇甲盒子、在丙和丁中，老闆會選擇丁盒子，如下圖綠圈處。儘管丙盒子裡面的 0 元紙條很吸引老闆，他也不敢選，因為他知道一旦選了丙盒子，我們會把兩萬元獎金拿走。</p>
+<p><img src="https://i.imgur.com/7mdxB3I.png"></p>
+<p>最後，看透老闆心思的我們，知道若選擇了 A 袋子最終會拿到 100 元、若選擇了 B 袋子最終會拿到 70 元，因此當然是選擇 A 袋子囉！儘管 B 袋子裡面有吸引人的兩萬元獎項，我們也不可選，因為我們知道老闆不會選擇丙盒子。最終這個 100 元就是雙方都以最佳策略互相制衡後，我們能夠拿到的獎金。</p>
+<p><img src="https://i.imgur.com/sbd9Pai.png"></p>
+<h2 id="Minimax-search-實作"><a href="#Minimax-search-實作" class="headerlink" title="Minimax search 實作"></a>Minimax search 實作</h2><p>在剛才的範例中，我們計算搜尋樹上每個節點的數值時，順序是先從 leaf 開始，計算出所有 leaf 的爸爸們，再計算出爺爺們，最後才算 root 阿祖。不過這個順序只有在人腦手算時方便易懂，若要寫程式讓電腦搜尋的話，從 root 開始往下遞迴會更簡潔，而且如此才能有機會使用 alpha-beta 剪枝來減少搜尋的數量。</p>
+<p>先來看看，從夜市老闆的角度，遞迴的程式長什麼樣子。對夜市老闆來說，他希望挑一個讓你拿到最少獎金的選項。首先，如果這個節點是 leaf，代表它是「一張紙條」，那根本沒什麼可選的，只得給出紙條上的金額；如果是個可做選擇的節點，那麼老闆要「每個都選給顧客看看」，看顧客能拿多少錢，並從中選擇金額最少的。</p>
+<pre class="line-numbers language-none"><code class="language-none">function vendor_get_min(treeNode node)
+    
+    &#x2F;&#x2F; 如果是 leaf，直接回傳該節點的值
+    if node is leaf then  
+        return node&#39;s value
+    
+    &#x2F;&#x2F; 每個都選給顧客看看，選出金額最少的
+    minimum &#x3D; ∞
+    for each child of node do
+        money &#x3D; customer_get_max(child) &#x2F;&#x2F; 遞迴呼叫客人的 function
+        minimum &#x3D; min(minimum, money)
+    return minimum
+    
+end function<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>再來看看，從客人的角度，遞迴的程式長什麼樣子。對客人來說，我們希望挑一個能拿到最多獎金的選項。首先，如果這個節點是 leaf，代表它是「一張紙條」，那根本沒什麼可選的，只得接受紙條上的金額；如果是個可做選擇的節點，那麼我們要「每個都選給老闆看看」，看老闆能壓低成多少錢，並從中選擇金額最多的。</p>
+<pre class="line-numbers language-none"><code class="language-none">function customer_get_max(treeNode node)
+    
+    &#x2F;&#x2F; 如果是 leaf，直接回傳該節點的值
+    if node is leaf then  
+        return node&#39;s value
+    
+    &#x2F;&#x2F; 每個都選給老闆看看，選出金額最多的
+    maximum &#x3D; -∞
+    for each child of node do
+        money &#x3D; vendor_get_min(child) &#x2F;&#x2F; 遞迴呼叫老闆的 function
+        maximum &#x3D; min(maximum, money)
+    return maximum
+    
+end function<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>只要讓兩個函數互相呼叫對方，一個選最大值，一個選最小值，並且設定好遞迴終止條件，就能成為正確的 minimax search 了！</p>
+<p>還是要記得，這個演算法的複雜度是指數級的，假設搜尋總共有 $h$ 層，每次都有 $k$ 個分支，那麼複雜度就是 $O(k^h)$，代表總共有 $k^h$ 個 leaf 都要被拜訪到。不過，由於我們只想知道「最小」、「最大」值為何，導致在搜尋的過程中，某些節點的值變得完全不重要，反正不會被選到，這種情況就可以省下計算該節點的時間！雖然複雜度仍然是 $O(k^h)$，但實務上卻能省下不少運算資源。這個技法就是 alpha-beta search！</p>
+<h2 id="Alpha-beta-剪枝的簡單例子"><a href="#Alpha-beta-剪枝的簡單例子" class="headerlink" title="Alpha-beta 剪枝的簡單例子"></a>Alpha-beta 剪枝的簡單例子</h2><p>我們來實際演示一次，在 minimax 搜尋的過程中，每個節點的值是如何被計算出來，以及何時有機會「省下」搜尋。</p>
+<p>根據我們的 DFS 遞迴式，我們計算樹上每個節點值的順序其實就是「post order traversal」，也就是對每個節點來說，當所有小孩的值都確定後，才能確定自己的值。</p>
+<p>我們用類似剛才的例子來示範：</p>
+<p><img src="https://i.imgur.com/N7oaJ44.png"></p>
+<p>首先，最先能確定的是顧客在甲盒子中挑的值 100，是兩張紙條 (100, 80) 之中較大的那張。</p>
+<p><img src="https://i.imgur.com/XrR7Ynp.png"></p>
+<p>這時來看看 A 節點。對於在「A袋子」裡挑「甲盒或乙盒」的老闆來說，他已知道「如果挑了甲盒子就要給顧客 100 元」，那麼這時他只在乎一件事：「選乙盒子可以比 100 元少嗎？」如果不能，他就直接選甲了。</p>
+<p>因此我們從顧客的角度看看乙盒子可以拿多少錢。我們首先翻開 10000 元的紙條，又起了貪念，想知道另一張紙條會有比 10000 元還要多的紙條嗎？但這時我們恢復理智，知道<strong>既然甲盒子是 100 元，那麼如果在乙盒子中選擇了高於 100 元的獎項，老闆就只會挑甲盒子</strong>。因此，另一張紙條是多少獎金一點也不重要了，<strong>低於 10000 的話顧客不會選，高於 100 的話老闆不會選</strong>。直接當成乙盒子是 10000 元就好，就算乙盒子裡有更大的值也沒關係！</p>
+<p><img src="https://i.imgur.com/607hsfo.png"></p>
+<p>這樣一來就能夠確定，若老闆拿到 A 袋子，他會選擇甲盒子的 100 元了。</p>
+<p><img src="https://i.imgur.com/y225GHT.png"></p>
+<p>而要從 A 袋子和 B 袋子中擇一的我們顧客，只在乎一件事：「選 B 袋子可以比 100 元多嗎？」如果不能，我們就直接選 A 了。</p>
+<p>因此我們從老闆的角度看看 B 袋子可以拿多少錢。首先試試看丙盒子，老闆得知我方會在 50 元和 70 元之間選擇 70 元。</p>
+<p><img src="https://i.imgur.com/Bw1NYWi.png"></p>
+<p>貪心的老闆想知道，如果選擇丁盒子，能不能出現比 70 元還要低的獎項？但這時他恢復理智，知道<strong>既然 A 袋子是 100 元，那麼如果在 B 袋子中選擇了低於 100 元的獎項，顧客就只會挑 A 袋子</strong>。因此，選擇丁盒子究竟會出現什麼獎項一點也不重要了，<strong>高於 70 的話老闆不願選，低於 100 的話顧客不會選</strong>。直接當成 B 袋子是 70 元就好！</p>
+<p><img src="https://i.imgur.com/DKqm8pd.png"></p>
+<p>這樣一來搜尋就完成了！顧客會在 A 袋子 100 元和 B 袋子 70 元之間選擇 100 元，這是和「腳踏實地把整棵樹搜完」一樣的結果，但是透過 alpha-beta 剪枝，我們少看了 4 個節點！雖然不能降低時間複雜度，但實際省下來的運算時間還是很可觀的。</p>
+<p><img src="https://i.imgur.com/6fcBUHC.png"></p>
+<h2 id="Alpha-beta-剪枝-規則整理"><a href="#Alpha-beta-剪枝-規則整理" class="headerlink" title="Alpha-beta 剪枝 - 規則整理"></a>Alpha-beta 剪枝 - 規則整理</h2>
             </div>
 
             <!-- Post Comments -->

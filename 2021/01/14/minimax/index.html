@@ -143,13 +143,13 @@
             </div>
             <!-- Post -->
             <div class="typo" style="padding: 3rem;">
-                <h1 id="Minimax-search-與-Alpha-beta-剪枝"><a href="#Minimax-search-與-Alpha-beta-剪枝" class="headerlink" title="Minimax search 與 Alpha-beta 剪枝"></a>Minimax search 與 Alpha-beta 剪枝</h1><p>Minimax search 是一種狀態搜尋演算法，在遊戲對局 AI 設計中時常會用到。如果你有玩五子棋、象棋、西洋棋等等的經驗，你在下棋的過程中是不是常在腦內有這樣的小劇場呢：「如果我動了這步，他大概會走甲或走乙。如果他走甲的話，那輪到我的時候我可以這樣；如果他走乙的話，那輪到我的時候我可以那樣…」，為了讓自己能做出最正確的選擇，要不斷地在對方的角度和自己的角度切換來切換去，試想看看當下的情況有哪些做法可選、最好的做法是什麼。這個「小劇場」的邏輯在遊戲對局 AI 的設計上也非常有用，而這個演算法的名字就叫做 minimax search。</p>
+                <h1 id="Minimax-search-與-Alpha-beta-剪枝"><a href="#Minimax-search-與-Alpha-beta-剪枝" class="headerlink" title="Minimax search 與 Alpha-beta 剪枝"></a>Minimax search 與 Alpha-beta 剪枝</h1><p>Minimax search 是一種狀態搜尋演算法，在遊戲對局 AI 設計中時常會用到。如果你有玩五子棋、象棋、西洋棋等等的經驗，你在下棋的過程中是不是常在腦內有這樣的小劇場呢：「如果我動了這步，他大概會有『甲行為』或『乙行為』，如果他做了甲行為的話，那輪到我的時候我可以這樣；如果他做了乙行為的話，那輪到我的時候我可以那樣…」，為了讓自己能做出最正確的選擇，要不斷地在對方的角度和自己的角度切換來切換去，試想看看當下的情況有哪些做法可選、最好的做法是什麼。這個「小劇場」的邏輯在遊戲對局 AI 的設計上也非常有用，而這個演算法的名字就叫做 minimax search。</p>
 <p>這篇將會介紹 minimax search，一步一步演示 minimax search 過程的脈絡，以及介紹一個可以減短搜尋過程的技法 — alpha-beta 剪枝。</p>
 <h2 id="Minimax-search-的適用情境"><a href="#Minimax-search-的適用情境" class="headerlink" title="Minimax search 的適用情境"></a>Minimax search 的適用情境</h2><p>minimax search 適用的情況必須符合三個條件：</p>
 <ul>
 <li>1.遊戲是零和遊戲，我愈賺，對方一定愈虧；我愈虧，對方一定愈賺</li>
 <li>2.遊戲資訊完全公開透明，沒有可隱瞞的</li>
-<li>3.雙方都以最佳的策略行動，沒有任何「隨機、賭賭看」的成分，完全可以正確預測出對方的行動</li>
+<li>3.雙方都以最佳的策略行動，所以沒有任何「隨機、賭賭看」的成分，完全可以正確預測出對方的行動</li>
 </ul>
 <p>舉例來說，像是排七(接龍)就不適合，因為看不到對手的牌，而且某些舉動可以利人利己或害人害己；像是大富翁也不適合，因為包含了擲骰子的隨機成分，完全無法預測對方，連自己的行為也無法掌握。</p>
 <p>像是雙人橋牌的打牌階段就很適合了，己方多吃一墩時，對方就少吃一墩，反之亦然，而且雙方都知道對方有哪些牌，也大致上都會照著最佳策略行動；許多棋類遊戲例如五子棋或是西洋棋、象棋也很適合，因為一旦自己露出破綻時，對方一定不會手下留情。不過棋類比較麻煩的地方是只有輸贏、沒有分數，但搜尋時卻又難以直接搜到輸贏結果，頂多搜到「吃掉、被吃掉」等等，因此還必須要另外設計把「吃掉、被吃掉」量化成「分數」的 heuristic，才能讓 minimax search 派上用場。</p>
@@ -179,7 +179,7 @@
 <li>2.任何 XOR 不為 0 的局面，都可以藉由減少某一疊的石頭數，變成 XOR 為 0 的局面</li>
 <li>3.任何 XOR 為 0 的局面，減少任何一疊的石頭數，都只能成為 XOR 不為 0 的局面</li>
 </ul>
-<p>不只是 Nim game 本身，所有有上述特質的遊戲，都能轉換成等價的「N 疊石頭」，並用 XOR 算出必勝或必敗。這個神奇理論稱為「SG 定理」，而「轉換」的動作稱為「SG 函數」，如果有興趣的話，可以搜尋「SG 定理」相關的資料，也可以參考看看 <a target="_blank" rel="noopener" href="https://slides.com/ko19951231/combinational"><strong><font color='blue'>我 2017 時寫的投影片</font></strong></a>，裡面有簡單的 SG 定理證明以及一些範例。簡而言之，這類型的遊戲如果能在 polynomial time 的時間算出 SG 值，總體的時間複雜度就也會是 polynomial time，不須用指數級的時間搜尋。再看看適用於 minimax search 的遊戲，由於雙方能對盤面做的動作不同 (只能動白子、只能動黑子)，所以無法用這個方法解決。</p>
+<p>不只是 Nim game 本身，所有有上述特質的遊戲，都能轉換成等價的「N 疊石頭」，並用 XOR 算出必勝或必敗。這個神奇理論稱為「SG 定理」，而「轉換」的動作稱為「SG 函數」，如果有興趣的話，可以搜尋「SG 定理」相關的資料，也可以參考看看 <a target="_blank" rel="noopener" href="https://slides.com/ko19951231/combinational"><strong><font color='blue'>我的 combinatorial game 投影片</font></strong></a>，裡面有簡單的 SG 定理證明以及一些範例。簡而言之，這類型的遊戲如果能在 polynomial time 的時間算出 SG 值，總體的時間複雜度就也會是 polynomial time，不須用指數級的時間搜尋。再看看適用於 minimax search 的遊戲，由於雙方能對盤面做的動作不同 (只能動白子、只能動黑子)，所以無法用這個方法解決。</p>
 <p>比較完這兩種可以避開指數級搜尋的遊戲系列，來正式介紹 minimax search 吧！</p>
 <h2 id="Minimax-search-簡單的例子"><a href="#Minimax-search-簡單的例子" class="headerlink" title="Minimax search 簡單的例子"></a>Minimax search 簡單的例子</h2><h3 id="兩層搜尋"><a href="#兩層搜尋" class="headerlink" title="兩層搜尋"></a>兩層搜尋</h3><p>夜市裡有個攤販老闆擺出了兩個盒子，每個盒子裡面有兩張紙條，每張紙條上面寫著一個金額。你可以任意選擇一個盒子，再讓老闆從你選的盒子中挑一張紙條，成為你能夠贏得的獎金。你想盡量拿到最多的獎金，老闆想盡量讓你拿到最少的獎金，互相制衡之下，你能夠拿多少獎金呢？<br><img src="https://i.imgur.com/r4nsBFG.png"><br>如果我們挑了甲盒子，老闆一定會選 80 的紙條；如果我們挑了乙盒子，老闆一定會選 50 的紙條。因此，我們要挑甲盒子，而 80 就是我們能拿到的獎金！儘管乙盒子裡面有一萬元獎金，我們也不能挑乙盒子，因為我們知道老闆一定不會選擇一萬元獎金紙條，我們看得到卻吃不到。<br><img src="https://i.imgur.com/HBupmMP.png"><br>如上圖，<font color='green'>綠色是老闆的選擇</font>，<font color='red'>紅色是我們的選擇</font>。我們也可以將選擇的過程用樹狀圖來表示：<br><img src="https://i.imgur.com/e8ZZGhl.png"></p>
 <h3 id="三層搜尋"><a href="#三層搜尋" class="headerlink" title="三層搜尋"></a>三層搜尋</h3><p><img src="https://i.imgur.com/KYPh67I.png"></p>
@@ -223,14 +223,14 @@ end function<span aria-hidden="true" class="line-numbers-rows"><span></span><spa
 end function<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>只要讓兩個函數互相呼叫對方，一個選最大值，一個選最小值，並且設定好遞迴終止條件，就能成為正確的 minimax search 了！</p>
 <p>還是要記得，這個演算法的複雜度是指數級的，假設搜尋總共有 $h$ 層，每次都有 $k$ 個分支，那麼複雜度就是 $O(k^h)$，代表總共有 $k^h$ 個 leaf 都要被拜訪到。不過，由於我們只想知道「最小」、「最大」值為何，導致在搜尋的過程中，某些節點的值變得完全不重要，反正不會被選到，這種情況就可以省下計算該節點的時間！雖然複雜度仍然是 $O(k^h)$，但實務上卻能省下不少運算資源。這個技法就是 alpha-beta search！</p>
-<h2 id="Alpha-beta-剪枝的簡單例子"><a href="#Alpha-beta-剪枝的簡單例子" class="headerlink" title="Alpha-beta 剪枝的簡單例子"></a>Alpha-beta 剪枝的簡單例子</h2><p>我們來實際演示一次，在 minimax 搜尋的過程中，每個節點的值是如何被計算出來，以及何時有機會「省下」搜尋。</p>
+<h2 id="Alpha-beta-剪枝-簡單的例子"><a href="#Alpha-beta-剪枝-簡單的例子" class="headerlink" title="Alpha-beta 剪枝 - 簡單的例子"></a>Alpha-beta 剪枝 - 簡單的例子</h2><p>我們來實際演示一次，在 minimax 搜尋的過程中，每個節點的值是如何被計算出來，以及何時有機會「省下」搜尋。</p>
 <p>根據我們的 DFS 遞迴式，我們計算樹上每個節點值的順序其實就是「post order traversal」，也就是對每個節點來說，當所有小孩的值都確定後，才能確定自己的值。</p>
 <p>我們用類似剛才的例子來示範：</p>
 <p><img src="https://i.imgur.com/N7oaJ44.png"></p>
 <p>首先，最先能確定的是顧客在甲盒子中挑的值 100，是兩張紙條 (100, 80) 之中較大的那張。</p>
 <p><img src="https://i.imgur.com/XrR7Ynp.png"></p>
 <p>這時來看看 A 節點。對於在「A袋子」裡挑「甲盒或乙盒」的老闆來說，他已知道「如果挑了甲盒子就要給顧客 100 元」，那麼這時他只在乎一件事：「選乙盒子可以比 100 元少嗎？」如果不能，他就直接選甲了。</p>
-<p>因此我們從顧客的角度看看乙盒子可以拿多少錢。我們首先翻開 10000 元的紙條，又起了貪念，想知道另一張紙條會有比 10000 元還要多的紙條嗎？但這時我們恢復理智，知道<strong>既然甲盒子是 100 元，那麼如果在乙盒子中選擇了高於 100 元的獎項，老闆就只會挑甲盒子</strong>。因此，另一張紙條是多少獎金一點也不重要了，<strong>低於 10000 的話顧客不會選，高於 100 的話老闆不會選</strong>。直接當成乙盒子是 10000 元就好，就算乙盒子裡有更大的值也沒關係！</p>
+<p>因此我們從顧客的角度看看乙盒子可以拿多少錢。我們首先翻開 10000 元的紙條，又起了貪念，想知道另一張紙條會有比 10000 元還要高額的紙條嗎？但這時我們恢復理智，知道<strong>既然甲盒子是 100 元，那麼如果在乙盒子中選擇了高於 100 元的獎項，老闆就只會挑甲盒子</strong>。因此，另一張紙條是多少獎金一點也不重要了，<strong>低於 10000 的話顧客不會選，高於 100 的話老闆不會選</strong>。直接當成乙盒子是 10000 元就好，就算乙盒子裡有更大的值也沒關係！</p>
 <p><img src="https://i.imgur.com/607hsfo.png"></p>
 <p>這樣一來就能夠確定，若老闆拿到 A 袋子，他會選擇甲盒子的 100 元了。</p>
 <p><img src="https://i.imgur.com/y225GHT.png"></p>
@@ -239,9 +239,33 @@ end function<span aria-hidden="true" class="line-numbers-rows"><span></span><spa
 <p><img src="https://i.imgur.com/Bw1NYWi.png"></p>
 <p>貪心的老闆想知道，如果選擇丁盒子，能不能出現比 70 元還要低的獎項？但這時他恢復理智，知道<strong>既然 A 袋子是 100 元，那麼如果在 B 袋子中選擇了低於 100 元的獎項，顧客就只會挑 A 袋子</strong>。因此，選擇丁盒子究竟會出現什麼獎項一點也不重要了，<strong>高於 70 的話老闆不願選，低於 100 的話顧客不會選</strong>。直接當成 B 袋子是 70 元就好！</p>
 <p><img src="https://i.imgur.com/DKqm8pd.png"></p>
-<p>這樣一來搜尋就完成了！顧客會在 A 袋子 100 元和 B 袋子 70 元之間選擇 100 元，這是和「腳踏實地把整棵樹搜完」一樣的結果，但是透過 alpha-beta 剪枝，我們少看了 4 個節點！雖然不能降低時間複雜度，但實際省下來的運算時間還是很可觀的。</p>
+<p>這樣一來搜尋就完成了！顧客會在 A 袋子 100 元和 B 袋子 70 元之間選擇 100 元，這是和「腳踏實地把整棵樹搜完」一樣的結果，但是透過 alpha-beta 剪枝，搜尋的過程「捨棄」了 4 個節點！雖然不能降低時間複雜度，但實際省下來的運算時間還是很可觀的。</p>
 <p><img src="https://i.imgur.com/6fcBUHC.png"></p>
-<h2 id="Alpha-beta-剪枝-規則整理"><a href="#Alpha-beta-剪枝-規則整理" class="headerlink" title="Alpha-beta 剪枝 - 規則整理"></a>Alpha-beta 剪枝 - 規則整理</h2>
+<h2 id="Alpha-beta-剪枝-規則整理"><a href="#Alpha-beta-剪枝-規則整理" class="headerlink" title="Alpha-beta 剪枝 - 規則整理"></a>Alpha-beta 剪枝 - 規則整理</h2><p>我們來統整一下，那些被「判定不重要」、「跳過」的節點，是依據什麼規則被跳過的？</p>
+<p><img src="https://i.imgur.com/ABkx489.png"></p>
+<p>上圖中藍色框處的節點 (15000 葉子) 是被跳過的節點之一，他被跳過的原因是：</p>
+<ul>
+<li>他的爺爺節點 (A 節點) 的大兒子 (甲節點) 是 100，而爺爺要取最小值，所以他要比 100 還要小，才會被爺爺選中</li>
+<li>他的爸爸節點 (乙節點) 的大兒子 (10000 葉子) 是 10000，而爸爸要取最大值，所以他要比 10000 還要大，才會被爸爸選中</li>
+<li>以上兩者的範圍是空集合，所以他絕對不可能「又被爸爸選上又被爺爺選上」</li>
+</ul>
+<p>再看剛才的另一個例子：</p>
+<p><img src="https://i.imgur.com/15Gr7um.png"></p>
+<p>上圖藍色框處的丁節點被跳過的原因是：</p>
+<ul>
+<li>他的爺爺節點 (root) 的大兒子 (A節點) 是 100，而爺爺要取最大值，所以他要比 100 還要大，才會被爺爺選中</li>
+<li>他的爸爸節點 (B節點) 的大兒子 (丙節點) 是 70，而爸爸要取最小值，所以他要比 70 還要小，才會被爸爸選中</li>
+<li>以上兩者的範圍是空集合，所以他絕對不可能「又被爸爸選上又被爺爺選上」</li>
+</ul>
+<p>如此可以發現，對每個節點來說，他的值若要有意義，就必須大於「該節點的每個『取最大值的祖先』的大兒子」，也必須小於「該節點的每個『取最小值的祖先』的大兒子」。就像上面的例子：「若爸爸想取最小值，那我必須比我的哥哥還要小；若爺爺想取最大值，那我必須比我的大伯還要大」。而一旦這個範圍成為空集合，我的值是什麼就完全不重要了，可以直接在我節點的頭上「剪枝」，捨棄我和我的所有子孫。</p>
+<p><img src="https://i.imgur.com/epBKvGv.png"></p>
+<p>如上圖所示，對於藍色框的 $me$ 節點來說，它的值必須大於 $x, y, z$，才有可能被紅色祖先們選中，這個搜尋時的「下界」就稱為 alpha $\alpha$，亦即 $\alpha = max(x, y, z)$；另一方面，藍色框節點 $me$ 的值也必須小於 $w, v$，才有可能被綠色祖先們選中，這個搜尋時的「上界」就稱為 beta $\beta$，亦即 $\beta = min(w, v)$。至於樹上的其他節點，在此時計算上下界 $\alpha, \beta$ 時則不需用到。一旦出現 $\alpha \geq \beta$，我們就可以確定 $me$ 節點絕對不會被祖先選上，因此可以直接剪去 $me$ 節點以及他的所有子孫。</p>
+<p>就算樹不是二元樹，也適用於這個規則。如下圖所示，我們可知 $\alpha = max(a, b, c, d, e)$ 以及 $\beta = min(p, q, r)$</p>
+<p><img src="https://i.imgur.com/PQAviVL.png"></p>
+<p>至於那些空心黑圈的「祖先的弟弟」們值為何，則不會影響此時的上下界，因為它們屬於的分支本來就要在此分支搜尋結束後才會探索到 (想想 DFS 的探索順序)，幸運的話也許還能藉由此分支算出的值，來把將來要被搜尋的弟弟叔叔們「剪枝」掉。</p>
+<p>也是因為這樣，搜尋過程中如何排序孩子們被搜索的順序就變得非常重要：對「要取最大值」的節點來說，應該要優先搜尋可能擁有較大值的子節點；對「要取最小值」的節點來說，也應該要優先搜尋可能擁有較小值的子節點。如此就會更有機會快速地讓上下界相併，把大部分還沒被搜尋的小兒子們剪枝掉，進而節省運算資源、加速搜尋時間。</p>
+<p>不過，都還沒有搜尋，要怎麼知道哪個子節點「可能擁有較大值」、哪個子節點「可能擁有較小值」呢？在使用這個 minimax 搜尋演算法時，我們通常會再設計一個 heuristic 函數來「粗估」每個節點可能會擁有的值，或是「粗略」排序每個節點的孩子們誰先誰後。當這個 heuristic 函數愈可靠，就愈有機會因為早日合併上下界而大量剪枝減少搜尋時間。這個 heuristic 函數有千百種，取決於 AI 的作者怎麼設計，有時甚至只是人類常識。以西洋棋為例，假設當前的盤面我方有兩種選擇：「吃掉對方的皇后」、「吃掉對方的士兵」，根據常識，我們應該先搜尋「吃掉皇后」的選項，因為一旦搜完後發現它的值大到能把上下界相併，就可以省去搜尋「吃掉士兵」的選項了。</p>
+<h2 id="Alpha-beta-剪枝-在-DFS-的過程維護-alpha-和-beta"><a href="#Alpha-beta-剪枝-在-DFS-的過程維護-alpha-和-beta" class="headerlink" title="Alpha-beta 剪枝 - 在 DFS 的過程維護 $\alpha$ 和 $\beta$"></a>Alpha-beta 剪枝 - 在 DFS 的過程維護 $\alpha$ 和 $\beta$</h2><h2 id="Alpha-beta-剪枝-實作"><a href="#Alpha-beta-剪枝-實作" class="headerlink" title="Alpha-beta 剪枝 - 實作"></a>Alpha-beta 剪枝 - 實作</h2>
             </div>
 
             <!-- Post Comments -->

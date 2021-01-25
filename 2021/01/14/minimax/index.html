@@ -153,34 +153,6 @@
 </ul>
 <p>舉例來說，像是排七(接龍)就不適合，因為看不到對手的牌，而且某些舉動可以利人利己或害人害己；像是大富翁也不適合，因為包含了擲骰子的隨機成分，完全無法預測對方，連自己的行為也無法掌握。</p>
 <p>像是雙人橋牌的打牌階段就很適合了，己方多吃一墩時，對方就少吃一墩，反之亦然，而且雙方都知道對方有哪些牌，也大致上都會照著最佳策略行動；許多棋類遊戲例如五子棋或是西洋棋、象棋也很適合，因為一旦自己露出破綻時，對方一定不會手下留情。不過棋類比較麻煩的地方是只有輸贏、沒有分數，但搜尋時卻又難以直接搜到輸贏結果，頂多搜到「吃掉、被吃掉」等等，因此還必須要另外設計把「吃掉、被吃掉」量化成「分數」的 heuristic，才能讓 minimax search 派上用場。</p>
-<h2 id="比較"><a href="#比較" class="headerlink" title="比較"></a>比較</h2><p>醜話要先說在前頭，minimax search 一定會是指數級的演算法。因為適用於 minimax search 的遊戲狀態種類的組合數量就是指數級，而搜尋的過程必須把所有可能都列舉出來，因此複雜度絕對逃不了指數級。也就是因為複雜度這麼要命，才會需要 alpha-beta 剪枝這個技法。</p>
-<p><img src="https://i.imgur.com/O8F9vof.png"><br>看看這個西洋棋盤，總共 $64$ 格，每一格有 $6+6+1$ 種可能，因此盤面總共約有 $13^{64}$ 種。或也可以算成總共有 $32$ 個棋子，每一個棋子的位置有 $64+1$ 種可能，因此盤面共約有 $65^{32}$。無論哪一種，都是令人頭痛的指數級。</p>
-<p>不過，一想到「零和遊戲、雙方都最佳策略」這些關鍵字，你會不會立刻就想到經典問題「Nim game」以及 leetcode 經典 DP 題目「Stone game」系列呢？他們究竟有什麼特質，可以不用指數級的 minimax search，而是可以被 Polynomial time 的演算法解決呢？</p>
-<p>先來討論較為直觀的 stone game 系列。</p>
-<blockquote>
-<p><a target="_blank" rel="noopener" href="https://leetcode.com/problems/stone-game-vii/"><strong><font color='blue'>Stone game 系列之 VII</font></strong></a>：有 N 疊石頭，Alice 和 Bob 輪流除去最左或最右的整疊石頭，並得到值為「剩下所有石頭數量加總」的分數。目標是最大化「己方總分減對方總分」</p>
-</blockquote>
-<p>雖然雙方每次都有兩種動作可以選，遊戲狀態組合看似會以 $2^N$ 增長，但實際上狀態們都會不斷重複出現，以 stone game VII 為例，「剩餘石頭堆的起始位置和結束位置」只會有 $N^2$ 種可能，因此只要利用 DP 把每一種對應的答案用表格存起來，就能把複雜度控制在 $N^2$。再看看適用 minimax search 的遊戲，儘管我們也能使出 DP 大法，把每個狀態對應的答案用表格存起來，但因為狀態的數量是指數級，表格的大小也會是指數級，所以還是避免不了指數級時間複雜度。</p>
-<p>再來討論較為玄學的 Nim game 系列。</p>
-<blockquote>
-<p><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%B0%BC%E5%A7%86%E6%B8%B8%E6%88%8F"><strong><font color='blue'>Nim game</font></strong></a>：有 N 疊石頭，Alice 和 Bob 輪流選取某一疊，並除去那一疊中任意數量的石頭，拿走最後一顆石頭的人獲勝</p>
-</blockquote>
-<p>Nim game 的遊戲狀態數量其實是指數級的：每一疊石頭最多有 $k$ 個，總共有 $N$ 疊石頭的話，遊戲狀態就有 $(k+1)^N$ 種。</p>
-<p>這種遊戲的特質為：只有輸贏沒有分數、而且不管輪到誰能做的動作都一樣、不會出現循環的盤面。因此盤面之間有這樣的遞迴規則：</p>
-<ul>
-<li>1.不能動的盤面，為「必敗」盤面 (輪到誰誰輸)</li>
-<li>2.可以動一步就成為必敗盤面的盤面，為「必勝」盤面 (輪到誰誰贏)</li>
-<li>3.任何動一步都只能成為必勝盤面的盤面，為「必敗」盤面 (輪到誰誰輸)</li>
-</ul>
-<p>不過經由神奇的數學研究，解 Nim game 不需要真的把所有狀態列出來搜尋，而是只要把每一疊石頭的數量 XOR 起來，若是 0 就是必敗盤面 (輪到誰誰輸)，否則就是必勝盤面 (輪到誰誰贏)！舉例來說，如果總共有三疊石頭，分別是「6顆、5顆、3顆」，那麼這時輪到誰，誰就輸定了！因為 $6⊕5⊕3=0$</p>
-<p>你可以簡單驗證看看：</p>
-<ul>
-<li>1.不能動的局面，亦即沒有半顆石頭的局面，XOR 值為0</li>
-<li>2.任何 XOR 不為 0 的局面，都可以藉由減少某一疊的石頭數，變成 XOR 為 0 的局面</li>
-<li>3.任何 XOR 為 0 的局面，減少任何一疊的石頭數，都只能成為 XOR 不為 0 的局面</li>
-</ul>
-<p>不只是 Nim game 本身，所有有上述特質的遊戲，都能轉換成等價的「N 疊石頭」，並用 XOR 算出必勝或必敗。這個神奇理論稱為「SG 定理」，而「轉換」的動作稱為「SG 函數」，如果有興趣的話，可以搜尋「SG 定理」相關的資料，也可以參考看看 <a target="_blank" rel="noopener" href="https://slides.com/ko19951231/combinational"><strong><font color='blue'>我的 combinatorial game 投影片</font></strong></a>，裡面有簡單的 SG 定理證明以及一些範例。簡而言之，這類型的遊戲如果能在 polynomial time 的時間算出 SG 值，總體的時間複雜度就也會是 polynomial time，不須用指數級的時間搜尋。再看看適用於 minimax search 的遊戲，由於雙方能對盤面做的動作不同 (只能動白子、只能動黑子)，所以無法用這個方法解決。</p>
-<p>比較完這兩種可以避開指數級搜尋的遊戲系列，來正式介紹 minimax search 吧！</p>
 <h2 id="Minimax-search-簡單的例子"><a href="#Minimax-search-簡單的例子" class="headerlink" title="Minimax search 簡單的例子"></a>Minimax search 簡單的例子</h2><h3 id="兩層搜尋"><a href="#兩層搜尋" class="headerlink" title="兩層搜尋"></a>兩層搜尋</h3><p>夜市裡有個攤販老闆擺出了兩個盒子，每個盒子裡面有兩張紙條，每張紙條上面寫著一個金額。你可以任意選擇一個盒子，再讓老闆從你選的盒子中挑一張紙條，成為你能夠贏得的獎金。你想盡量拿到最多的獎金，老闆想盡量讓你拿到最少的獎金，互相制衡之下，你能夠拿多少獎金呢？<br><img src="https://i.imgur.com/r4nsBFG.png"><br>如果我們挑了甲盒子，老闆一定會選 80 的紙條；如果我們挑了乙盒子，老闆一定會選 50 的紙條。因此，我們要挑甲盒子，而 80 就是我們能拿到的獎金！儘管乙盒子裡面有一萬元獎金，我們也不能挑乙盒子，因為我們知道老闆一定不會選擇一萬元獎金紙條，我們看得到卻吃不到。<br><img src="https://i.imgur.com/HBupmMP.png"><br>如上圖，<font color='green'>綠色是老闆的選擇</font>，<font color='red'>紅色是我們的選擇</font>。我們也可以將選擇的過程用樹狀圖來表示：<br><img src="https://i.imgur.com/e8ZZGhl.png"></p>
 <h3 id="三層搜尋"><a href="#三層搜尋" class="headerlink" title="三層搜尋"></a>三層搜尋</h3><p><img src="https://i.imgur.com/KYPh67I.png"></p>
 <p>現在我們更改一下遊戲規則：我們可以從 A、B 兩個袋子中挑一個，老闆從我們挑的袋子中選一個盒子，我們再從老闆選的盒子中挑一張紙條。雙方制衡之下，我們能拿到多少獎金呢？</p>
@@ -260,12 +232,39 @@ end function<span aria-hidden="true" class="line-numbers-rows"><span></span><spa
 <p>如此可以發現，對每個節點來說，他的值若要有意義，就必須大於「該節點的每個『取最大值的祖先』的大兒子」，也必須小於「該節點的每個『取最小值的祖先』的大兒子」。就像上面的例子：「若爸爸想取最小值，那我必須比我的哥哥還要小；若爺爺想取最大值，那我必須比我的大伯還要大」。而一旦這個範圍成為空集合，我的值是什麼就完全不重要了，可以直接在我節點的頭上「剪枝」，捨棄我和我的所有子孫。</p>
 <p><img src="https://i.imgur.com/epBKvGv.png"></p>
 <p>如上圖所示，對於藍色框的 $me$ 節點來說，它的值必須大於 $x, y, z$，才有可能被紅色祖先們選中，這個搜尋時的「下界」就稱為 alpha $\alpha$，亦即 $\alpha = max(x, y, z)$；另一方面，藍色框節點 $me$ 的值也必須小於 $w, v$，才有可能被綠色祖先們選中，這個搜尋時的「上界」就稱為 beta $\beta$，亦即 $\beta = min(w, v)$。至於樹上的其他節點，在此時計算上下界 $\alpha, \beta$ 時則不需用到。一旦出現 $\alpha \geq \beta$，我們就可以確定 $me$ 節點絕對不會被祖先選上，因此可以直接剪去 $me$ 節點以及他的所有子孫。</p>
-<p>就算樹不是二元樹，也適用於這個規則。如下圖所示，我們可知 $\alpha = max(a, b, c, d, e)$ 以及 $\beta = min(p, q, r)$</p>
+<p>就算樹不是二元樹，也適用於這個規則。如下圖所示，我們可知對 $me$ 節點來說，下界 $\alpha = max(a, b, c, d, e)$ 以及上界 $\beta = min(p, q, r)$</p>
 <p><img src="https://i.imgur.com/PQAviVL.png"></p>
 <p>至於那些空心黑圈的「祖先的弟弟」們值為何，則不會影響此時的上下界，因為它們屬於的分支本來就要在此分支搜尋結束後才會探索到 (想想 DFS 的探索順序)，幸運的話也許還能藉由此分支算出的值，來把將來要被搜尋的弟弟叔叔們「剪枝」掉。</p>
 <p>也是因為這樣，搜尋過程中如何排序孩子們被搜索的順序就變得非常重要：對「要取最大值」的節點來說，應該要優先搜尋可能擁有較大值的子節點；對「要取最小值」的節點來說，也應該要優先搜尋可能擁有較小值的子節點。如此就會更有機會快速地讓上下界相併，把大部分還沒被搜尋的小兒子們剪枝掉，進而節省運算資源、加速搜尋時間。</p>
 <p>不過，都還沒有搜尋，要怎麼知道哪個子節點「可能擁有較大值」、哪個子節點「可能擁有較小值」呢？在使用這個 minimax 搜尋演算法時，我們通常會再設計一個 heuristic 函數來「粗估」每個節點可能會擁有的值，或是「粗略」排序每個節點的孩子們誰先誰後。當這個 heuristic 函數愈可靠，就愈有機會因為早日合併上下界而大量剪枝減少搜尋時間。這個 heuristic 函數有千百種，取決於 AI 的作者怎麼設計，有時甚至只是人類常識。以西洋棋為例，假設當前的盤面我方有兩種選擇：「吃掉對方的皇后」、「吃掉對方的士兵」，根據常識，我們應該先搜尋「吃掉皇后」的選項，因為一旦搜完後發現它的值大到能把上下界相併，就可以省去搜尋「吃掉士兵」的選項了。</p>
-<h2 id="Alpha-beta-剪枝-在-DFS-的過程維護-alpha-和-beta"><a href="#Alpha-beta-剪枝-在-DFS-的過程維護-alpha-和-beta" class="headerlink" title="Alpha-beta 剪枝 - 在 DFS 的過程維護 $\alpha$ 和 $\beta$"></a>Alpha-beta 剪枝 - 在 DFS 的過程維護 $\alpha$ 和 $\beta$</h2><h2 id="Alpha-beta-剪枝-實作"><a href="#Alpha-beta-剪枝-實作" class="headerlink" title="Alpha-beta 剪枝 - 實作"></a>Alpha-beta 剪枝 - 實作</h2>
+<h2 id="Alpha-beta-剪枝-在-DFS-的過程維護-alpha-和-beta"><a href="#Alpha-beta-剪枝-在-DFS-的過程維護-alpha-和-beta" class="headerlink" title="Alpha-beta 剪枝 - 在 DFS 的過程維護 $\alpha$ 和 $\beta$"></a>Alpha-beta 剪枝 - 在 DFS 的過程維護 $\alpha$ 和 $\beta$</h2><h2 id="Alpha-beta-剪枝-實作"><a href="#Alpha-beta-剪枝-實作" class="headerlink" title="Alpha-beta 剪枝 - 實作"></a>Alpha-beta 剪枝 - 實作</h2><h2 id="附錄：比較其他情境"><a href="#附錄：比較其他情境" class="headerlink" title="附錄：比較其他情境"></a>附錄：比較其他情境</h2><p>最後，來比較一下 minimax search 以及其他常見的 game theory 情境以及適用的演算法。首先，此篇介紹的 minimax search 是指數級的演算法，因為適用於 minimax search 的遊戲狀態種類的組合數量就是指數級，而搜尋的過程必須把所有可能都列舉出來，因此複雜度絕對逃不了指數級。也就是因為複雜度這麼要命，才會需要 alpha-beta 剪枝這個技法。</p>
+<p><img src="https://i.imgur.com/O8F9vof.png"><br>看看這個西洋棋盤，總共 $64$ 格，每一格有 $6+6+1$ 種可能，因此盤面總共約有 $13^{64}$ 種。或也可以算成總共有 $32$ 個棋子，每一個棋子的位置有 $64+1$ 種可能，因此盤面共約有 $65^{32}$。無論哪一種，都是令人頭痛的指數級。</p>
+<p>不過，一想到「零和遊戲、雙方都最佳策略」這些關鍵字，你會不會聯想到經典問題「Nim game」以及 leetcode 經典 DP 題目「Stone game」系列呢？他們究竟有什麼特質，可以不用指數級的 minimax search，而是可以被 Polynomial time 的演算法解決呢？</p>
+<p>先來討論較為直觀的 stone game 系列。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://leetcode.com/problems/stone-game-vii/"><strong><font color='blue'>Stone game 系列之 VII</font></strong></a>：有 N 疊石頭，Alice 和 Bob 輪流除去最左或最右的整疊石頭，並得到值為「剩下所有石頭數量加總」的分數。目標是最大化「己方總分減對方總分」</p>
+</blockquote>
+<p>雖然雙方每次都有兩種動作可以選，遊戲狀態組合看似會以 $2^N$ 增長，但實際上狀態們都會不斷重複出現，以 stone game VII 為例，「剩餘石頭堆的起始位置和結束位置」只會有 $N^2$ 種可能，因此只要利用 DP 把每一種對應的答案用表格存起來，就能把複雜度控制在 $N^2$。再看看適用 minimax search 的遊戲，儘管我們也能使出 DP 大法，把每個狀態對應的答案用表格存起來，但因為狀態的數量是指數級，表格的大小也會是指數級，所以還是避免不了指數級時間複雜度。</p>
+<p>再來討論較為玄學的 Nim game 系列。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%B0%BC%E5%A7%86%E6%B8%B8%E6%88%8F"><strong><font color='blue'>Nim game</font></strong></a>：有 N 疊石頭，Alice 和 Bob 輪流選取某一疊，並除去那一疊中任意數量的石頭，拿走最後一顆石頭的人獲勝</p>
+</blockquote>
+<p>Nim game 的遊戲狀態數量其實是指數級的：每一疊石頭最多有 $k$ 個，總共有 $N$ 疊石頭的話，遊戲狀態就有 $(k+1)^N$ 種。</p>
+<p>這種遊戲的特質為：只有輸贏沒有分數、而且不管輪到誰能做的動作都一樣、不會出現循環的盤面。因此盤面之間有這樣的遞迴規則：</p>
+<ul>
+<li>1.不能動的盤面，為「必敗」盤面 (輪到誰誰輸)</li>
+<li>2.可以動一步就成為必敗盤面的盤面，為「必勝」盤面 (輪到誰誰贏)</li>
+<li>3.任何動一步都只能成為必勝盤面的盤面，為「必敗」盤面 (輪到誰誰輸)</li>
+</ul>
+<p>不過經由神奇的數學研究，解 Nim game 不需要真的把所有狀態列出來搜尋，而是只要把每一疊石頭的數量 XOR 起來，若是 0 就是必敗盤面 (輪到誰誰輸)，否則就是必勝盤面 (輪到誰誰贏)！舉例來說，如果總共有三疊石頭，分別是「6顆、5顆、3顆」，那麼這時輪到誰，誰就輸定了，因為 $6⊕5⊕3=0$；如果總共有兩疊石頭，分別是「4顆、2顆」，那麼這時輪到誰，誰就贏定了，因為 $4⊕2 =6\neq0$！</p>
+<p>你可以簡單驗證看看：</p>
+<ul>
+<li>1.不能動的局面，亦即沒有任何石頭的局面，XOR 值為0</li>
+<li>2.任何 XOR 不為 0 的局面，都可以藉由減少某一疊的石頭數，變成 XOR 為 0 的局面</li>
+<li>3.任何 XOR 為 0 的局面，減少任何一疊的石頭數，都只能成為 XOR 不為 0 的局面</li>
+</ul>
+<p>不只是 Nim game 本身，所有有上述特質的遊戲，都能轉換成等價的「N 疊石頭」，並用 XOR 算出必勝或必敗。這個神奇理論稱為「SG 定理」，而「轉換」的動作稱為「SG 函數」，如果有興趣的話，可以搜尋「SG 定理」相關的資料，也可以參考看看 <a target="_blank" rel="noopener" href="https://slides.com/ko19951231/combinational"><strong><font color='blue'>我的 combinatorial game theory 投影片</font></strong></a>，裡面有簡單的 SG 定理證明以及一些範例。簡而言之，這類型的遊戲如果能在 polynomial time 的時間算出 SG 值，總體的時間複雜度就也會是 polynomial time，不須用指數級的時間搜尋。再看看適用於本篇演算法的遊戲，由於雙方能對盤面做的動作集合不相同 (例如只能動白子或只能動黑子、只能選袋子或只能選紙條)，所以無法用這個方法解決。</p>
+
             </div>
 
             <!-- Post Comments -->

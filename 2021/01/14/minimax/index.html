@@ -164,7 +164,7 @@
 <p><img src="https://i.imgur.com/sbd9Pai.png"></p>
 <h2 id="Minimax-search-實作"><a href="#Minimax-search-實作" class="headerlink" title="Minimax search 實作"></a>Minimax search 實作</h2><p>在剛才的範例中，我們計算搜尋樹上每個節點的數值時，順序是先從 leaf 開始，計算出所有 leaf 的爸爸們，再計算出爺爺們，最後才算 root 阿祖。不過這個順序只有在人腦手算時方便易懂，若要寫程式讓電腦搜尋的話，從 root 開始往下遞迴會更簡潔，而且如此才能有機會使用 alpha-beta 剪枝來減少搜尋的數量。</p>
 <p>先來看看，從夜市老闆的角度，遞迴的程式長什麼樣子。對夜市老闆來說，他希望挑一個讓你拿到最少獎金的選項。首先，如果這個節點是 leaf，代表它是「一張紙條」，那根本沒什麼可選的，只得給出紙條上的金額；如果是個可做選擇的節點，那麼老闆要「每個都選給顧客看看」，看顧客能拿多少錢，並從中選擇金額最少的。</p>
-<pre class="line-numbers language-none"><code class="language-none">function vendor_get_min(treeNode node)
+<pre class="line-numbers language-none"><code class="language-none">function vendor_get_min(node)
     
     &#x2F;&#x2F; 如果是 leaf，直接回傳該節點的值
     if node is leaf then  
@@ -179,7 +179,7 @@
     
 end function<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>再來看看，從客人的角度，遞迴的程式長什麼樣子。對客人來說，我們希望挑一個能拿到最多獎金的選項。首先，如果這個節點是 leaf，代表它是「一張紙條」，那根本沒什麼可選的，只得接受紙條上的金額；如果是個可做選擇的節點，那麼我們要「每個都選給老闆看看」，看老闆能壓低成多少錢，並從中選擇金額最多的。</p>
-<pre class="line-numbers language-none"><code class="language-none">function customer_get_max(treeNode node)
+<pre class="line-numbers language-none"><code class="language-none">function customer_get_max(node)
     
     &#x2F;&#x2F; 如果是 leaf，直接回傳該節點的值
     if node is leaf then  
@@ -189,7 +189,7 @@ end function<span aria-hidden="true" class="line-numbers-rows"><span></span><spa
     maximum &#x3D; -∞
     for each child of node do
         money &#x3D; vendor_get_min(child) &#x2F;&#x2F; 遞迴呼叫老闆的 function
-        maximum &#x3D; min(maximum, money)
+        maximum &#x3D; max(maximum, money)
     return maximum
     
 end function<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
@@ -261,11 +261,48 @@ end function<span aria-hidden="true" class="line-numbers-rows"><span></span><spa
 <p><img src="https://i.imgur.com/YTDuOzz.png"></p>
 <p>由於丙節點要取最大值，因此在得知大兒子的值是 50 後應該要更新下界，但原本的下界就是 100 了，$max(100, 50)=100$，所以搜尋小兒子時維持原本的範圍 $(100, \infty)$。範圍不為空，所以攤開小兒子看看，發現值為 70。</p>
 <p><img src="https://i.imgur.com/SQA7wqE.png"></p>
-<p>算出丙的所有子節點後，就可以知道丙的值為 70 了。再來，由於 B 節點要取最小值，因此在得知大兒子丙節點的值是 70 後，就將<strong>上界</strong>更新為 70，再拜訪小兒子丁節點。然而 $(100, 70)$ 是空集合，因此小兒子是什麼值都無所謂，要把小兒子丁節點「剪枝」掉。</p>
+<p>算出丙的所有子節點後，就可以知道丙的值為 70 了。再來，由於 B 節點要取最小值，因此在得知大兒子丙節點的值是 70 後，就將<strong>上界</strong>更新為 70，再拜訪小兒子丁節點。然而 $(100, 70)$ 是空集合，因此丁節點是什麼值都無所謂，要把丁節點「剪枝」掉。</p>
 <p><img src="https://i.imgur.com/W3v4xtq.png"></p>
 <p>如此一來就完成搜尋了，root 的值是 100。</p>
 <p><img src="https://i.imgur.com/Hjrewjt.png"></p>
-<h2 id="Alpha-beta-剪枝-實作"><a href="#Alpha-beta-剪枝-實作" class="headerlink" title="Alpha-beta 剪枝 - 實作"></a>Alpha-beta 剪枝 - 實作</h2><h2 id="附錄：比較其他情境"><a href="#附錄：比較其他情境" class="headerlink" title="附錄：比較其他情境"></a>附錄：比較其他情境</h2><p>最後，來比較一下 minimax search 以及其他常見的 game theory 情境以及適用的演算法。此篇介紹的 minimax search 是指數級的演算法，因為適用於 minimax search 的遊戲狀態種類的組合數量就是指數級，而搜尋的過程必須把所有可能都列舉出來，因此複雜度絕對逃不了指數級。也就是因為複雜度這麼要命，才會需要 alpha-beta 剪枝這個技法。</p>
+<h2 id="Alpha-beta-剪枝-實作"><a href="#Alpha-beta-剪枝-實作" class="headerlink" title="Alpha-beta 剪枝 - 實作"></a>Alpha-beta 剪枝 - 實作</h2><p>了解了 alpha-beta 剪枝的原理後，來為 minimax search 加上 alpha-beta 剪枝吧！</p>
+<p>這是「取最小值」的節點對應的函數，在呼叫函數時，我們多傳遞兩個參數 alpha 和 beta，並且在每次取得子節點的值時更新 beta：</p>
+<pre class="line-numbers language-none"><code class="language-none">function vendor_get_min(node, alpha, beta)
+    
+    &#x2F;&#x2F; 如果是 leaf，直接回傳該節點的值
+    if node is leaf then  
+        return node&#39;s value
+    
+    &#x2F;&#x2F; 每個都選給顧客看看，選出金額最少的
+    minimum &#x3D; ∞
+    for each child of node do
+        money &#x3D; customer_get_max(child, alpha, beta) &#x2F;&#x2F; 遞迴呼叫客人的 function
+        minimum &#x3D; min(minimum, money)
+        beta &#x3D; min(beta, money) &#x2F;&#x2F; 用子節點的值更新上界 beta
+        if alpha &gt;&#x3D; beta then &#x2F;&#x2F; 如果範圍已是空集合，則不須再檢查剩下的小兒子們
+            break
+    return minimum
+    
+end function<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>「取最大值」的節點對應的函數也是同樣的道理，要在每次取得子節點的值時更新下界 alpha：</p>
+<pre class="line-numbers language-none"><code class="language-none">function customer_get_max(node, alpha, beta)
+    
+    &#x2F;&#x2F; 如果是 leaf，直接回傳該節點的值
+    if node is leaf then  
+        return node&#39;s value
+    
+    &#x2F;&#x2F; 每個都選給老闆看看，選出金額最多的
+    maximum &#x3D; -∞
+    for each child of node do
+        money &#x3D; vendor_get_min(child, alpha, beta) &#x2F;&#x2F; 遞迴呼叫老闆的 function
+        maximum &#x3D; max(maximum, money)
+        alpha &#x3D; max(alpha, money) &#x2F;&#x2F; 用子節點的值更新下界 alpha
+        if alpha &gt;&#x3D; beta then &#x2F;&#x2F; 如果範圍已是空集合，則不須再檢查剩下的小兒子們
+            break
+    return maximum
+    
+end function<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="附錄：比較其他情境"><a href="#附錄：比較其他情境" class="headerlink" title="附錄：比較其他情境"></a>附錄：比較其他情境</h2><p>最後，來比較一下 minimax search 以及其他常見的 game theory 情境以及適用的演算法。此篇介紹的 minimax search 是指數級的演算法，因為適用於 minimax search 的遊戲狀態種類的組合數量就是指數級，而搜尋的過程必須把所有可能都列舉出來，因此複雜度絕對逃不了指數級。也就是因為複雜度這麼要命，才會需要 alpha-beta 剪枝這個技法。</p>
 <p><img src="https://i.imgur.com/O8F9vof.png"><br>看看這個西洋棋盤，總共 $64$ 格，每一格有 $6+6+1$ 種可能，因此盤面總共約有 $13^{64}$ 種。或也可以算成總共有 $32$ 個棋子，每一個棋子的位置有 $64+1$ 種可能，因此盤面共約有 $65^{32}$。無論哪一種，都是令人頭痛的指數級。</p>
 <p>不過，一想到「零和遊戲、雙方都最佳策略」這些關鍵字，你會不會聯想到經典問題「Nim game」以及 leetcode 經典 DP 題目「Stone game」系列呢？他們究竟有什麼特質，可以不用指數級的 minimax search，而是可以被 Polynomial time 的演算法解決呢？</p>
 <p>先來討論較為直觀的 stone game 系列。</p>

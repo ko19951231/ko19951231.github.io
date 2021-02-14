@@ -144,12 +144,12 @@
             <!-- Post -->
             <div class="typo" style="padding: 3rem;">
                 <h1 id="Google-Hash-Code-For-Intern-解題分享"><a href="#Google-Hash-Code-For-Intern-解題分享" class="headerlink" title="Google Hash Code For Intern 解題分享"></a>Google Hash Code For Intern 解題分享</h1><h2 id="介紹"><a href="#介紹" class="headerlink" title="介紹"></a>介紹</h2><p>暑假我在 Google 實習的期間，Google 舉辦了一場名為 Hash Code For Intern 的比賽讓實習生參加。據說題面會跟某年 Hash Code 一樣，但測資會改。</p>
-<p>Hash Code 和 Code Jam 非常不一樣，比較像 <a target="_blank" rel="noopener" href="http://iccad-contest.org/2020/tw/"><font color='blue'>CAD Contest at ICCAD</font></a>，題目是 NP 問題，雖然題面格式跟一般的演算法題目類似，但若要得到最佳解就必須要用 exponential time 的窮舉搜索。因此這樣的比賽通常會設計一個合理的計分公式來衡量我們給的解有多好，並以此來決定排名，有點類似像是 ML 類的比賽會用準確率之類的來決定排名。順道一提， Hash Code 或 CAD 的題目好像都不太適合用 ML 解決。</p>
+<p>Hash Code 和 Code Jam 非常不一樣，比較像 <a target="_blank" rel="noopener" href="http://iccad-contest.org/2020/tw/"><strong><font color='blue'>CAD Contest at ICCAD</font></strong></a>，題目是 NP 問題，雖然題面格式跟一般的演算法題目類似，但若要得到最佳解就必須要用 exponential time 的窮舉搜索。因此這樣的比賽通常會設計一個合理的計分公式來衡量我們給的解有多好，並以此來決定排名，有點類似像是 ML 類的比賽會用準確率之類的來決定排名。順道一提， Hash Code 或 CAD 的題目好像都不太適合用 ML 解決。</p>
 <p>不同於 CAD，Hash Code 的測資會完全釋出給參賽者，總分通常是五筆測資的分數加總，而這五筆測資會各有特別的性質。參賽者完全可以針對每一筆測資去設計高針對性的演算法來獲得高分，應該說 Hash Code 本就非常鼓勵參賽者去分析測資的特性藉以設計特殊的演算法。也因為這樣，儘管 Hash Code For Intern 的題目會用舊題，只要測資重新針對不同的性質生出新的五筆，就還是能避免以前看過題目/題解的人有太大的優勢。(而且比賽前我們並不知道是和哪一年題面一樣)</p>
 <p>不過 Hash Code For Intern 和 Hash Code 不太一樣的地方是，Hash Code 限時 4 個小時，而 Hash Code For Intern 則是有 24 小時可以作題。我覺得滿可能是因為各地的 Google 實習生都能參加 (例如歐洲)，考量公平性而決定的時間。我覺得既然這樣的話，Hash Code 也應該要辦 24 小時，不然對應台灣的時間是凌晨 2 點到 6 點，對於住在台灣的人太不利了。</p>
 <h2 id="比賽結果"><a href="#比賽結果" class="headerlink" title="比賽結果"></a>比賽結果</h2><p>比賽好像還滿少人參加的，除去只有報名沒有提交過答案的隊伍之後，就只剩 159 隊而已。雖然這是組隊報名的比賽，但我根本找不到隊友，幸好還是順利單人參加了。我的成績是第三名，運氣真的滿好的，也是因為我真的很喜歡這種 NP 最佳化的問題，所以整個比賽過程都很有熱忱的在想解法，出去買晚餐過馬路都在想，好像找回大二參加 CAD contest 時的熱情。</p>
 <p>接下來會介紹題目跟我的作法，有興趣的話可以往下看哦~~</p>
-<h2 id="題目"><a href="#題目" class="headerlink" title="題目"></a>題目</h2><p>Hash Code For Intern 的題面和<a target="_blank" rel="noopener" href="https://storage.googleapis.com/coding-competitions.appspot.com/HC/2017/hashcode2017_qualification_task.pdf"><font color='blue'> 2017 年 Hash Code 的 Qualify round </font></a>的題面一樣，但我完全不清楚當年的測資跟這次的測資分別有什麼特質，因為我只來得及生出通用的解法，沒有多餘的時間針對各別的測資做研究跟優化。分析 data 真是一門很高深的學問呢，QQ</p>
+<h2 id="題目"><a href="#題目" class="headerlink" title="題目"></a>題目</h2><p>Hash Code For Intern 的題面和<a target="_blank" rel="noopener" href="https://storage.googleapis.com/coding-competitions.appspot.com/HC/2017/hashcode2017_qualification_task.pdf"><strong><font color='blue'> 2017 年 Hash Code 的 Qualification round </font></strong></a>的題面一樣，但我完全不清楚當年的測資跟這次的測資分別有什麼特質，因為我只來得及生出通用的解法，沒有多餘的時間針對各別的測資做研究跟優化。分析 data 真是一門很高深的學問呢，QQ</p>
 <p><img src="https://i.imgur.com/58fAZ5R.png"></p>
 <h3 id="Data-Center-資料中心"><a href="#Data-Center-資料中心" class="headerlink" title="Data Center 資料中心"></a>Data Center 資料中心</h3><p>我們有一個資料中心，裡面有各式各樣的影片(至多10000個)，分別有不同的檔案大小</p>
 <h3 id="Cache-Servers-快取伺服器"><a href="#Cache-Servers-快取伺服器" class="headerlink" title="Cache Servers 快取伺服器"></a>Cache Servers 快取伺服器</h3><p>我們有一堆快取伺服器(至多1000個)，一開始通通是空的，並且有一個固定的容量</p>
@@ -161,7 +161,7 @@
 <h3 id="Requests-請求"><a href="#Requests-請求" class="headerlink" title="Requests 請求"></a>Requests 請求</h3><p>我們收到了一堆請求(至多1000000個)，每一個請求都闡述了「某個客戶端」要獲取「某部影片」總共「多少次」</p>
 <h3 id="我們要進行的操作"><a href="#我們要進行的操作" class="headerlink" title="我們要進行的操作"></a>我們要進行的操作</h3><p>我們要做的事情是：「對於每一個快取伺服器，決定要放哪些影片進去」，每部影片都可以重複放在不同的伺服器裡，但每個快取伺服器所含的影片的檔案大小總和不能超過快取伺服器的容量限制。</p>
 <p>一旦我們將某部影片放進某個快取伺服器後，有和該伺服器連線的客戶端就可以從這個伺服器拿影片了，因此如果該客戶端和該伺服器之間的傳輸時間很短，這個操作就能讓該客戶端大量減少拿這部影片的時間。</p>
-<p>我們的目標就是考慮所有請求 (request)，盡量減少每個請求中客戶端拿影片的時間。</p>
+<p>我們的目標就是根據所有請求 (request)，盡量減少每個請求中客戶端拿影片的時間。</p>
 <h3 id="計分"><a href="#計分" class="headerlink" title="計分"></a>計分</h3><p>當我們決定好每一個快取伺服器要包含哪些影片之後，就可以計算我們總共省下了多少時間。</p>
 <p>對於每一個請求(用戶端、影片、次數)，原本所需要花的時間就是該用戶端從資料中心拿影片的時間，乘以次數，稱為 $T$</p>
 <p>假設我們的答案裡，某些伺服器擁有該影片，那麼現在所需要花的時間則是該用戶端從「有和它連線」且「傳輸給它所需時間最少」的伺服器拿影片的時間，乘以次數，稱為 $t$</p>
@@ -281,7 +281,7 @@
 </li>
 <li><p>$V_iC_j$ 代表「把 $i$ 號影片放進 $j$ 號快取」的動作，例如「把 $2$ 號影片放進 $0$ 號快取」就寫作$V_2C_0$</p>
 </li>
-<li><p>$S=[V_{i_1}C_{j_1}, V_{i_2}C_{j_2}, …,V_{i_n}C_{j_n}]$ 一連串的動作即集結為一組解$S$<br><img src="https://i.imgur.com/Yufdt6f.png"><br>例如此圖代表的解即為$[V_2C_0, V_1C_1, V_3C_1, V_0C_2, V_1C_2]$，順序並不重要</p>
+<li><p>$S=[V_{i_1}C_{j_1}, V_{i_2}C_{j_2}, …,V_{i_n}C_{j_n}]$ 一連串的動作即集結為一組解$S$<br><img src="https://i.imgur.com/1t4L9H9.png"><br>例如此圖代表的解即為$[V_2C_0, V_1C_1, V_3C_1, V_0C_2, V_1C_2]$，順序並不重要</p>
 </li>
 <li><p>$score(S)$ 代表 $S$ 這組解的分數。如果 $S$ 不合法(例如某個快取超載了)的話，定義$score(S)=-\infty$<br>注意，$score(S)$ 的值完全不受 $score(S)$ 裡的動作順序影響 </p>
 </li>
@@ -325,7 +325,7 @@ WaitingList 初始化為所有「影片對快取」的組合 &#123;ViCj | 0 ≤ 
 <p>至此，程式已經能跑得又快又好了，不過為了更高分我還加了一些修改。</p>
 <h3 id="Unit-Reward"><a href="#Unit-Reward" class="headerlink" title="Unit Reward"></a>Unit Reward</h3><p>我的 Greedy 策略永遠是很貪心地選擇讓 Immediate reward 最大的 $V_iC_j$，完全不顧可能留下的爛攤子，像是拿到 size 太大的影片一下就把快取佔滿等等。</p>
 <p><img src="https://i.imgur.com/pRHewLW.png"></p>
-<p>以這個例子來說，我的 Greedy 策略會選擇把 $V_0$ 放進快取裡，然後快取就滿了。但更高分的做法是選擇 $V_1+V_2$。為了解決這個問題，我把原本的 Immediate reward 修正為 Unit reward，也就是將原本的 reward 除以影片的 size</p>
+<p>以這個例子來說，我的 Greedy 策略會選擇把 $V_0$ 放進快取裡，然後快取就放不下任何其他影片了。但更高分的做法是選擇 $V_1+V_2$。為了解決這個問題，我把原本的 Immediate reward 修正為 Unit reward，也就是將原本的 reward 除以影片的 size</p>
 <p>$UR(S, V_xC_y)=\frac{R(S, V_xC_y)}{size(V_x)} = \frac{score(S \cup V_xC_y)-score(S)}{size(V_x)}$</p>
 <p><img src="https://i.imgur.com/epGoi6L.png"></p>
 <p>注意儘管計算 reward 的函數改了，它仍然是個遞減的函數，所以仍然適用原本的 PQ 技法。改完這個 reward 函數後，分數果然又有了一波大躍進。</p>
